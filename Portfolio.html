@@ -265,7 +265,7 @@ svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
         </div>
       </div>
       <div class="hero-inner">
-        <img id="profile-pic" src="" alt="Profile Photo" onerror="this.style.display='none'"/>
+        <img id="profile-pic" src="" alt="Profile Photo"/>
         <p style="font-family:'Press Start 2P',monospace;font-size:8px;color:#374151;position:relative;z-index:3">&gt;&gt;&gt; SYSTEM READY</p>
         <div class="editable-zone" style="position:relative;z-index:3;width:100%">
           <button class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
@@ -320,6 +320,35 @@ svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
     </div>
   </section>
 
+  <!-- EDUCATION -->
+  <section>
+    <div class="window">
+      <div class="win-bar" style="background:#1e293b">
+        <span class="win-title">EDUCATION.DAT</span>
+        <div class="win-dots"><div class="dot" style="background:#eab308"></div><div class="dot" style="background:#22c55e"></div><div class="dot" style="background:#ef4444"></div></div>
+      </div>
+      <div style="padding:20px 22px">
+        <div class="section-head">
+          <svg class="px" width="18" height="18" viewBox="0 0 18 18" fill="#60a5fa" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 1L1 5.5 9 10 17 5.5 9 1Z"/>
+            <path d="M1 8.2V5.5L9 9.9l8-4.4v2.7L9 12.6 1 8.2Z"/>
+            <path d="M1 11v-2.1L9 13.3l8-4.4V11l-8 4.7L1 11Z"/>
+          </svg>
+          <span class="section-title">COLLEGE_DETAILS</span>
+          <div class="editable-zone" style="margin-left:auto">
+            <button class="edit-pencil" onclick="openEducationEdit()">✏ EDIT EDUCATION</button>
+          </div>
+        </div>
+
+        <div style="margin-top:14px; font-size:13px; color:#6b7280; line-height:1.9;">
+          <p style="margin-bottom:8px;"><span style="color:#4ade80;">COLLEGE:</span> <span id="d-college"></span></p>
+          <p style="margin-bottom:8px;"><span style="color:#4ade80;">CGPA:</span> <span id="d-cgpa"></span></p>
+          <p><span style="color:#4ade80;">ADDRESS:</span> <span id="d-college-address" style="white-space:pre-wrap; word-break:break-word;"></span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CONTACT -->
   <section>
     <div class="window" style="margin-bottom:70px">
@@ -369,12 +398,10 @@ svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
 <!-- ══════════ SCRIPT ══════════ -->
 <script>
 // Convert Google Drive "share" links into direct image URLs that browsers can load as <img>.
-function normalizeProfileImageUrl(url) {
+function getDriveImageUrls(url) {
   const u = String(url || "").trim();
-  if (!u) return "";
-
-  // If it's already a direct image URL (or another host), keep it.
-  if (!u.includes("drive.google.com")) return u;
+  if (!u) return [];
+  if (!u.includes("drive.google.com")) return [];
 
   // Supported formats:
   // - https://drive.google.com/file/d/FILE_ID/view?usp=sharing
@@ -384,8 +411,20 @@ function normalizeProfileImageUrl(url) {
     (u.match(/\/file\/d\/([^\/?#]+)/i) || [])[1] ||
     (u.match(/[?&]id=([^&]+)/i) || [])[1];
 
-  if (!fileId) return u;
-  return `https://drive.google.com/uc?export=view&id=${fileId}`;
+  if (!fileId) return [];
+  return [
+    // "view" usually works, but some Drive links fail and require "download".
+    `https://drive.google.com/uc?export=view&id=${fileId}`,
+    `https://drive.google.com/uc?export=download&id=${fileId}`,
+  ];
+}
+function normalizeProfileImageUrl(url) {
+  const u = String(url || "").trim();
+  if (!u) return "";
+
+  if (!u.includes("drive.google.com")) return u;
+  const urls = getDriveImageUrls(u);
+  return urls[0] || u;
 }
 
 const ADMIN_EMAIL = 'aditya7karale@gmail.com';
@@ -405,6 +444,7 @@ const db   = firebase.database();
 // Default data
 const DEFAULTS = {
   hero:     { name:"YOUR NAME", role:"Student Developer · UI/UX Enthusiast", sub:"Building cool things — one commit at a time", resumeUrl:"#", profilePic:"" },
+  education:{ collegeName:"", cgpa:"", collegeAddress:"" },
   skills:   ["React","TypeScript","JavaScript","Python","Tailwind CSS","Node.js","GitHub","HTML/CSS","SQL","Figma"],
   projects: [
     { title:"PORTFOLIO.EXE",   emoji:"🌐", desc:"Personal portfolio with pixel-art aesthetic and animations.",  tags:["React","Tailwind","JS"],  link:"#", showWarning:false },
@@ -424,6 +464,7 @@ db.ref('portfolio').once('value').then(snap => {
     const d = snap.val();
     DATA = {
       hero:     d.hero     || DEFAULTS.hero,
+      education:d.education|| DEFAULTS.education,
       skills:   d.skills   || DEFAULTS.skills,
       projects: d.projects || DEFAULTS.projects,
       contact:  d.contact  || DEFAULTS.contact
@@ -433,7 +474,7 @@ db.ref('portfolio').once('value').then(snap => {
 });
 
 // ── Render ──────────────────────────────────────────────────────────────────
-function renderAll() { renderHero(); renderSkills(); renderProjects(); renderContact(); }
+function renderAll() { renderHero(); renderSkills(); renderProjects(); renderEducation(); renderContact(); }
 
 function renderHero() {
   const h = DATA.hero;
@@ -442,9 +483,40 @@ function renderHero() {
   document.getElementById('d-sub').textContent  = h.sub  || '';
   document.getElementById('d-resume').href      = h.resumeUrl || '#';
   const pic = document.getElementById('profile-pic');
-  const normalized = normalizeProfileImageUrl(h.profilePic);
-  if (normalized) { pic.src = normalized; pic.style.display = 'block'; }
-  else { pic.style.display = 'none'; }
+  const rawPic =
+    h.profilePic ||
+    h.profile_pic ||
+    h.profilePicUrl ||
+    h.profile_photo ||
+    '';
+  const driveUrls = getDriveImageUrls(rawPic);
+  const normalized = normalizeProfileImageUrl(rawPic);
+
+  if (normalized) {
+    pic.style.display = 'block';
+    pic.src = normalized;
+
+    // If the first Drive URL variant fails, try a second one.
+    pic.onerror = () => {
+      const next = (driveUrls || []).find(u => u && u !== pic.src);
+      if (next) {
+        pic.src = next;
+        return;
+      }
+      pic.style.display = 'none';
+    };
+  } else {
+    pic.style.display = 'none';
+    pic.src = '';
+    pic.onerror = null;
+  }
+}
+
+function renderEducation() {
+  const ed = DATA.education || DEFAULTS.education;
+  document.getElementById('d-college').textContent = ed.collegeName || '';
+  document.getElementById('d-cgpa').textContent = ed.cgpa || '';
+  document.getElementById('d-college-address').textContent = ed.collegeAddress || '';
 }
 
 function renderSkills() {
@@ -608,6 +680,34 @@ function openSkillsEdit() {
   `, () => {
     DATA.skills = document.getElementById('f-skills').value
       .split('\n').map(s=>s.trim()).filter(Boolean);
+    save();
+  });
+}
+
+// ── Edit: Education ─────────────────────────────────────────────────────────
+function openEducationEdit() {
+  if (!isAdmin) return;
+  const ed = DATA.education || DEFAULTS.education;
+  openModal('EDIT EDUCATION', `
+    <div class="form-group">
+      <label class="form-label">COLLEGE NAME</label>
+      <input class="form-input" id="f-college" value="${esc(ed.collegeName)}" placeholder="e.g. Your College Name"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">CGPA</label>
+      <input class="form-input" id="f-cgpa" value="${esc(ed.cgpa)}" placeholder="e.g. 8.65"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">COLLEGE ADDRESS</label>
+      <textarea class="form-textarea" id="f-caddr" style="min-height:90px">${esc(ed.collegeAddress)}</textarea>
+      <p class="form-hint">Supports multiple lines.</p>
+    </div>
+  `, () => {
+    DATA.education = {
+      collegeName:    document.getElementById('f-college').value,
+      cgpa:           document.getElementById('f-cgpa').value,
+      collegeAddress:document.getElementById('f-caddr').value
+    };
     save();
   });
 }
