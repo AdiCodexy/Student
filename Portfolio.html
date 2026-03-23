@@ -528,12 +528,49 @@
     .hero-inner {
       position: relative;
       display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 52px 24px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hero-left {
+      display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: 52px 24px;
-      gap: 14px;
+      flex: 1;
+      min-width: 250px;
     }
+
+    .hero-right {
+      border: 1px solid #374151;
+      padding: 18px;
+      min-width: 280px;
+      background: #0e1018;
+      flex: 1;
+      position: relative;
+      z-index: 3;
+    }
+
+    .edu-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: #fff;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .edu-line {
+      font-size: 12px;
+      color: #d1d5db;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .edu-line strong { color: #4ade80; }
 
     #profile-pic {
       width: 120px;
@@ -940,25 +977,35 @@
             </div>
           </div>
           <div class="hero-inner">
-            <img id="profile-pic" src="" alt="Profile Photo" />
-            <p style="font-family:'Press Start 2P',monospace;font-size:8px;color:#374151;position:relative;z-index:3">
-              &gt;&gt;&gt; SYSTEM READY</p>
-            <div class="editable-zone" style="position:relative;z-index:3;width:100%">
-              <button class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
-              <h1
-                style="font-family:'Press Start 2P',monospace;font-size:clamp(14px,3vw,22px);line-height:1.9;color:#fff">
-                HI, I'M<br />
-                <span id="d-name" style="color:#4ade80;text-shadow:0 0 24px #4ade8055">YOUR NAME</span>
-              </h1>
-              <p id="d-role" style="font-size:15px;color:#6b7280;margin-top:10px">Student Developer · UI/UX Enthusiast
-              </p>
-              <p id="d-sub" style="font-size:12px;color:#374151;margin-top:6px">Building cool things — one commit at a
-                time</p>
-              <a id="d-resume" href="#" class="start-btn" style="margin-top:16px">&#9660; DOWNLOAD RESUME</a>
+            <div class="hero-left">
+              <img id="profile-pic" src="" alt="Profile Photo" />
+              <p style="font-family:'Press Start 2P',monospace;font-size:8px;color:#374151;position:relative;z-index:3">
+                &gt;&gt;&gt; SYSTEM READY</p>
+              <div class="editable-zone" style="position:relative;z-index:3;width:100%">
+                <button class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
+                <h1
+                  style="font-family:'Press Start 2P',monospace;font-size:clamp(14px,3vw,22px);line-height:1.9;color:#fff">
+                  HI, I'M<br />
+                  <span id="d-name" style="color:#4ade80;text-shadow:0 0 24px #4ade8055">YOUR NAME</span>
+                </h1>
+                <p id="d-role" style="font-size:15px;color:#6b7280;margin-top:10px">Student Developer · UI/UX Enthusiast
+                </p>
+                <p id="d-sub" style="font-size:12px;color:#374151;margin-top:6px">Building cool things — one commit at a
+                  time</p>
+                <a id="d-resume" href="#" class="start-btn" style="margin-top:16px">&#9660; DOWNLOAD RESUME</a>
+              </div>
+              <p
+                style="font-family:'Press Start 2P',monospace;font-size:6px;color:#1f2937;margin-top:10px;position:relative;z-index:3">
+                © 2025 PORTFOLIO — ALL RIGHTS RESERVED</p>
             </div>
-            <p
-              style="font-family:'Press Start 2P',monospace;font-size:6px;color:#1f2937;margin-top:10px;position:relative;z-index:3">
-              © 2025 PORTFOLIO — ALL RIGHTS RESERVED</p>
+            
+            <div class="hero-right editable-zone">
+              <button class="edit-pencil" onclick="openEduEdit()" style="position:absolute;top:-15px;right:0;">✏ EDIT EDU</button>
+              <div class="edu-title">COLLEGE_DETAILS</div>
+              <div class="edu-line"><strong>COLLEGE:</strong> <span id="d-college">IIT Madras</span></div>
+              <div class="edu-line"><strong>CGPA:</strong> <span id="d-cgpa">7.2</span></div>
+              <div class="edu-line"><strong>DEGREES:</strong> <span id="d-degrees">BTech</span></div>
+            </div>
           </div>
         </div>
       </section>
@@ -1106,6 +1153,7 @@
     // Default data
     const DEFAULTS = {
       hero: { name: "YOUR NAME", role: "Student Developer · UI/UX Enthusiast", sub: "Building cool things — one commit at a time", resumeUrl: "#", profilePic: "" },
+      edu: { college: "Your College", cgpa: "9.0", degrees: "Your Degree" },
       skills: ["React", "TypeScript", "JavaScript", "Python", "Tailwind CSS", "Node.js", "GitHub", "HTML/CSS", "SQL", "Figma"],
       projects: [
         { title: "PORTFOLIO.EXE", emoji: "🌐", desc: "Personal portfolio with pixel-art aesthetic and animations.", tags: ["React", "Tailwind", "JS"], link: "#", showWarning: false },
@@ -1125,6 +1173,7 @@
         const d = snap.val();
         DATA = {
           hero: d.hero || DEFAULTS.hero,
+          edu: d.edu || DEFAULTS.edu,
           skills: d.skills || DEFAULTS.skills,
           projects: d.projects || DEFAULTS.projects,
           contact: d.contact || DEFAULTS.contact
@@ -1134,7 +1183,14 @@
     });
 
     // ── Render ──────────────────────────────────────────────────────────────────
-    function renderAll() { renderHero(); renderSkills(); renderProjects(); renderContact(); }
+    function renderAll() { renderHero(); renderEdu(); renderSkills(); renderProjects(); renderContact(); }
+
+    function renderEdu() {
+      const e = DATA.edu || DEFAULTS.edu;
+      document.getElementById('d-college').textContent = e.college || '';
+      document.getElementById('d-cgpa').textContent = e.cgpa || '';
+      document.getElementById('d-degrees').textContent = e.degrees || '';
+    }
 
     function renderHero() {
       const h = DATA.hero;
@@ -1309,6 +1365,33 @@
     }
 
     // ── Edit: Skills ─────────────────────────────────────────────────────────────
+    function openEduEdit() {
+      if (!isAdmin) return;
+      const e = DATA.edu || DEFAULTS.edu;
+      openModal('EDIT COLLEGE DETAILS', `
+    <div class="form-group">
+      <label class="form-label">COLLEGE NAME</label>
+      <input class="form-input" id="f-college" value="${esc(e.college)}"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">CGPA</label>
+      <input class="form-input" id="f-cgpa" value="${esc(e.cgpa)}"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">DEGREES / ABOUT</label>
+      <textarea class="form-textarea" id="f-degrees">${esc(e.degrees)}</textarea>
+    </div>
+  `, () => {
+        DATA.edu = {
+          college: document.getElementById('f-college').value,
+          cgpa: document.getElementById('f-cgpa').value,
+          degrees: document.getElementById('f-degrees').value
+        };
+        save();
+      });
+    }
+
+    // ── Edit: Skills ─────────────────────────────────────────────────────────────
     function openSkillsEdit() {
       if (!isAdmin) return;
       openModal('EDIT SKILLS', `
@@ -1456,12 +1539,12 @@
       reset() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * -100 - 20;
-        this.size = (Math.random() * 5 + 4) * 2.5; // Scaled up 2.5x
-        this.speedY = Math.random() * 1.5 + 0.5;
-        this.speedX = Math.random() * 1.5 - 0.75;
+        this.size = Math.random() * 2 + 2; // Pixel art small squares, 2-4px scale
+        this.speedY = Math.random() * 0.8 + 0.3; // Calmer drift
+        this.speedX = Math.random() * 1.0 - 0.5;
         this.angle = Math.random() * Math.PI * 2;
-        this.spin = (Math.random() - 0.5) * 0.05;
-        this.opacity = Math.random() * 0.4 + 0.2;
+        this.spin = (Math.random() - 0.5) * 0.02;
+        this.opacity = Math.random() * 0.4 + 0.4;
 
         // Glitch properties
         this.isGlitching = false;
@@ -1477,8 +1560,8 @@
           this.reset();
         }
 
-        // Random glitch trigger
-        if (!this.isGlitching && Math.random() < 0.002) {
+        // Random glitch trigger (rare: 1 in 1000 frames per particle approx)
+        if (!this.isGlitching && Math.random() < 0.0005) {
           this.isGlitching = true;
           this.glitchTimer = Math.random() * 10 + 5; // Glitch duration frames
         }
@@ -1499,20 +1582,31 @@
         let currentOp = this.opacity;
 
         if (this.isGlitching) {
-          if (Math.random() < 0.4) currentX += (Math.random() - 0.5) * 80; // Larger X jump
-          if (Math.random() < 0.3) currentY += (Math.random() - 0.5) * 15; // Y displacement
-          if (Math.random() < 0.6) currentOp = Math.random() * 0.05;       // Sharper opacity drops
+          if (Math.random() < 0.6) currentX += (Math.random() - 0.5) * 80;
+          if (Math.random() < 0.6) currentY += (Math.random() - 0.5) * 15;
+          if (Math.random() < 0.6) currentOp = Math.random() * 0.1 + 0.05;
         }
 
         ctx.translate(currentX, currentY);
-        ctx.rotate(this.angle);
+        // Only rotate if not glitching, glitch looks better statically aligned
+        if (!this.isGlitching) ctx.rotate(this.angle);
 
         if (this.isGlitching && Math.random() < 0.5) {
-          // Chromatic aberration (wider red & cyan separation)
-          ctx.fillStyle = "rgba(255, 0, 80, " + currentOp + ")";
-          this.drawPetal(16, 0);
-          ctx.fillStyle = "rgba(0, 255, 255, " + currentOp + ")";
-          this.drawPetal(-16, 0);
+          if (Math.random() < 0.5) {
+            // Chromatic aberration blocky shift
+            ctx.fillStyle = "rgba(0, 255, 255, " + currentOp + ")";
+            this.drawPetal(16, 0);
+            ctx.fillStyle = "rgba(255, 0, 255, " + currentOp + ")";
+            this.drawPetal(-16, 0);
+          } else {
+             // Blocky static pattern
+             ctx.fillStyle = "cyan";
+             ctx.fillRect(-this.size*3, -this.size, this.size*2, this.size*3);
+             ctx.fillStyle = "magenta";
+             ctx.fillRect(this.size, -this.size*2, this.size*3, this.size*2);
+             ctx.fillStyle = "rgba(255, 255, 255, " + currentOp + ")";
+             ctx.fillRect(-this.size, this.size, this.size*4, this.size);
+          }
         } else {
           ctx.fillStyle = "rgba(255, 183, 197, " + currentOp + ")";
           this.drawPetal(0, 0);
@@ -1522,17 +1616,15 @@
       }
 
       drawPetal(x, y) {
-        ctx.beginPath();
-        // stylized petal curve
-        ctx.moveTo(x, y - this.size);
-        ctx.bezierCurveTo(x + this.size, y - this.size * 0.5, x + this.size * 0.5, y + this.size, x, y + this.size);
-        ctx.bezierCurveTo(x - this.size * 0.5, y + this.size, x - this.size, y - this.size * 0.5, x, y - this.size);
-        ctx.fill();
+        // Blocky pixel-art sprite (cluster of squares)
+        const s = Math.round(this.size);
+        ctx.fillRect(x - s, y - s*2, s*2, s*4); // Vertical stem
+        ctx.fillRect(x - s*2, y - s, s*4, s*2); // Horizontal cross
       }
     }
 
     const sakuras = [];
-    const particleCount = Math.min(Math.floor(window.innerWidth / 15), 100);
+    const particleCount = Math.min(Math.floor(window.innerWidth / 80), 8); // Sparse: 5-8 particles max
     for (let i = 0; i < particleCount; i++) {
       sakuras.push(new Sakura());
     }
@@ -1540,73 +1632,26 @@
     let globalTime = 0;
     function drawBranches() {
       ctx.save();
-      ctx.lineCap = "square";
-      ctx.lineJoin = "miter";
+      // Blocky static dark branches
+      ctx.fillStyle = "#161111"; // Dark brown/grey pixel tree
+      const s = 10; // Pixel size for tree blocks
       
-      const sway1 = Math.sin(globalTime * 0.02) * 0.03;
-      const sway2 = Math.cos(globalTime * 0.015) * 0.03;
+      // Top Left pixelation coords [x, y, w, h] multipliers
+      const branchL = [
+        [0,0, 4,14], [4,4, 4,2], [4,6, 8,4], [12,6, 4,2],
+        [8,10, 4,4], [12,12, 6,2], [16,14, 4,2],
+        [0,14, 2,8], [2,18, 4,4], [6,20, 2,2]
+      ];
+      branchL.forEach(b => ctx.fillRect(b[0]*s, b[1]*s, b[2]*s, b[3]*s));
 
-      ctx.fillStyle = "#10121a";
-      ctx.strokeStyle = "#1e293b";
-      ctx.lineWidth = 4;
-
-      // Top Left Branch
-      ctx.save();
-      ctx.translate(0, 0);
-      ctx.rotate(sway1);
-      
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(120, 20);
-      ctx.lineTo(240, 80);
-      ctx.lineTo(340, 70);
-      ctx.lineTo(400, 110);
-      ctx.lineTo(370, 40);
-      ctx.lineTo(260, 10);
-      ctx.lineTo(140, -30);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // Top Left Sub-branch
-      ctx.beginPath();
-      ctx.moveTo(180, 50);
-      ctx.lineTo(240, 140);
-      ctx.lineTo(270, 160);
-      ctx.lineTo(280, 120);
-      ctx.lineTo(230, 50);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-
-      // Top Right Branch
-      ctx.save();
+      // Top Right
       ctx.translate(canvas.width, 0);
-      ctx.rotate(sway2);
-
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(-140, 40);
-      ctx.lineTo(-240, 50);
-      ctx.lineTo(-380, 120);
-      ctx.lineTo(-320, 30);
-      ctx.lineTo(-180, -20);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // Top Right Sub-branch
-      ctx.beginPath();
-      ctx.moveTo(-220, 45);
-      ctx.lineTo(-280, 140);
-      ctx.lineTo(-250, 150);
-      ctx.lineTo(-200, 50);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-
+      const branchR = [
+        [-4,0, 4,16], [-8,6, 4,4], [-12,8, 4,6],
+        [-16,12, 4,2], [-20,10, 4,2],
+        [-8,18, 4,2], [-14,20, 6,2], [-18,22, 4,2]
+      ];
+      branchR.forEach(b => ctx.fillRect(b[0]*s, b[1]*s, b[2]*s, b[3]*s));
       ctx.restore();
     }
 
@@ -1628,4 +1673,4 @@
   </script>
 </body>
 
-</html>
+  </html>
