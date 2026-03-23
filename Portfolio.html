@@ -529,30 +529,52 @@
         .hero-inner {
             position: relative;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 0 24px 52px;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 0 24px 40px;
+            gap: 30px;
+            flex-wrap: wrap;
         }
 
         .hero-left {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            text-align: center;
-            width: 100%;
+            align-items: flex-start;
+            text-align: left;
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+            z-index: 4;
         }
 
         .hero-right {
             border: 1px solid #374151;
             padding: 18px;
+            flex: 1;
             width: 100%;
-            max-width: 480px;
+            max-width: 320px;
             background: #0e1018;
             position: relative;
             z-index: 3;
-            margin-top: 36px;
+            margin-top: 30px;
             text-align: left;
+        }
+
+        @media (max-width: 650px) {
+            .hero-inner {
+                flex-direction: column;
+                align-items: center;
+                padding: 0 24px 40px;
+            }
+            .hero-left {
+                align-items: center;
+                text-align: center;
+            }
+            .hero-right {
+                max-width: 480px;
+                margin-top: 20px;
+            }
         }
 
         .edu-title {
@@ -576,7 +598,7 @@
 
         .hero-banner {
             width: 100%;
-            height: 160px;
+            height: 120px;
             background-color: #1a1c23;
             background-size: cover;
             background-position: center;
@@ -587,7 +609,7 @@
 
         .pfp-wrapper {
             position: relative;
-            margin-top: -85px;
+            margin-top: -65px;
             /* Overlap banner */
             margin-bottom: 12px;
             display: inline-block;
@@ -598,9 +620,9 @@
             height: 130px;
             border-radius: 50%;
             object-fit: cover;
-            /* Thick border matching background #10121a to simulate cutout */
-            border: 7px solid #10121a;
-            background: #10121a;
+            /* Thick border matching background #0d1117 to simulate cutout */
+            border: 7px solid #0d1117;
+            background: #0d1117;
             display: none;
         }
 
@@ -611,7 +633,7 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: #10121a;
+            background: #0d1117;
             /* Cutout match */
             display: flex;
             align-items: center;
