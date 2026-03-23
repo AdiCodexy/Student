@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Alex Chen — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0c0c10;
+    color: #e2e8f0;
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+  }
+
+  .pixel { font-family: 'Press Start 2P', monospace; }
+  .mono  { font-family: 'Share Tech Mono', monospace; }
+
+  /* ── Animations ── */
+  @keyframes fillBar   { from { width: 0 } to { width: 100% } }
+  @keyframes blink     { 0%,100%{opacity:1} 50%{opacity:0} }
+  @keyframes floatUp   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+  @keyframes floatDown { 0%,100%{transform:translateY(0) rotate(10deg)} 50%{transform:translateY(10px) rotate(10deg)} }
+  @keyframes sparkle   { 0%,100%{opacity:1;transform:scale(1) rotate(0deg)} 50%{opacity:.6;transform:scale(1.4) rotate(180deg)} }
+  @keyframes fadeIn    { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes glowPulse {
+    0%,100%{ box-shadow: 0 0 8px #4ade8066, inset -4px -4px 0 #166534, inset 4px 4px 0 #86efac; }
+    50%    { box-shadow: 0 0 28px #4ade80aa, inset -4px -4px 0 #166534, inset 4px 4px 0 #86efac; }
+  }
+
+  .bar-fill  { animation: fillBar 3s ease-out forwards; height:100%; background:#4ade80; }
+  .blink     { animation: blink 1s step-end infinite; }
+  .f-up-1    { animation: floatUp 3s ease-in-out infinite; }
+  .f-up-2    { animation: floatUp 3.6s ease-in-out infinite .4s; }
+  .f-up-3    { animation: floatUp 4.2s ease-in-out infinite .8s; }
+  .f-down-1  { animation: floatDown 3.2s ease-in-out infinite .2s; }
+  .f-down-2  { animation: floatDown 4s ease-in-out infinite .9s; }
+  .sparkle   { animation: sparkle 2.2s ease-in-out infinite; }
+  .sparkle2  { animation: sparkle 2.8s ease-in-out infinite .6s; }
+  .fade-in   { animation: fadeIn .7s ease-out forwards; }
+
+  /* ── Layout helpers ── */
+  .container { max-width: 780px; margin: 0 auto; padding: 0 16px; }
+
+  /* ── Window ── */
+  .window {
+    border: 2px solid #374151;
+    background: #10121a;
+    box-shadow: 4px 4px 0 #1f2937, 8px 8px 0 #0a0a0e;
+    margin-bottom: 20px;
+  }
+  .win-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background: #1e3a8a;
+  }
+  .win-title { font-family:'Press Start 2P',monospace; font-size:7px; color:#fff; letter-spacing:1px; }
+  .win-dots  { display:flex; gap:5px; }
+  .dot       { width:10px; height:10px; border-radius:50%; border:1px solid rgba(0,0,0,.3); }
+
+  /* ── Scanlines ── */
+  .scanlines { position:relative; }
+  .scanlines::after {
+    content:'';
+    position:absolute; inset:0;
+    background: repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.07) 3px,rgba(0,0,0,.07) 4px);
+    pointer-events:none; z-index:1;
+  }
+
+  /* ── Loading bar ── */
+  #loading-wrap {
+    display:flex; flex-direction:column; align-items:center;
+    padding: 28px 0 10px;
+  }
+  .bar-track {
+    width:220px; height:18px;
+    border:2px solid #374151;
+    background:#1a1d28;
+    overflow:hidden;
+    image-rendering:pixelated;
+  }
+  #load-txt { font-family:'Press Start 2P',monospace; font-size:8px; color:#4b5563; margin-top:8px; }
+
+  /* ── Hero ── */
+  #hero { padding: 8px 0 28px; }
+  .hero-inner {
+    position:relative;
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center;
+    padding: 52px 24px;
+    gap: 14px;
+    z-index:0;
+  }
+  .hero-sys { font-family:'Press Start 2P',monospace; font-size:8px; color:#374151; }
+  .hero-name {
+    font-family:'Press Start 2P',monospace;
+    font-size: clamp(14px,3vw,24px);
+    line-height:1.9; color:#fff;
+  }
+  .hero-name span { color:#4ade80; text-shadow:0 0 24px #4ade8055; }
+  .hero-role { font-size:16px; color:#6b7280; }
+  .hero-sub  { font-size:12px; color:#374151; margin-top:-6px; }
+
+  /* START button */
+  .start-btn {
+    font-family:'Press Start 2P',monospace;
+    font-size:12px; letter-spacing:2px;
+    color:#fff; background:#16a34a;
+    border:3px solid #14532d;
+    padding:14px 34px;
+    cursor:pointer;
+    animation: glowPulse 2.4s ease-in-out infinite;
+    margin-top:6px;
+    transition: filter .1s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .start-btn:hover  { filter:brightness(1.2); }
+  .start-btn:active {
+    box-shadow: inset 4px 4px 0 #166534, inset -4px -4px 0 #86efac !important;
+    transform: translate(2px,2px);
+    animation:none;
+  }
+  .hero-copy { font-family:'Press Start 2P',monospace; font-size:6px; color:#1f2937; margin-top:6px; }
+
+  /* Floating decorations */
+  .deco {
+    position:absolute;
+    pointer-events:none;
+    z-index:2;
+    line-height:1;
+  }
+
+  /* ── Skills ── */
+  .section-head {
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:18px;
+  }
+  .section-title { font-family:'Press Start 2P',monospace; font-size:10px; color:#fff; }
+  .section-sub   { font-family:'Press Start 2P',monospace; font-size:7px; color:#374151; margin-left:4px; }
+
+  .tags { display:flex; flex-wrap:wrap; gap:8px; }
+  .tag {
+    font-family:'Press Start 2P',monospace; font-size:7px;
+    color:#d1d5db;
+    border:1px solid #374151;
+    background:#181b26;
+    padding:8px 15px;
+    border-radius:9999px;
+    cursor:default;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .tag:hover { background:#4ade80; color:#000; border-color:#4ade80; }
+
+  /* ── Projects ── */
+  .projects-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap:14px;
+  }
+  .project-card {
+    border:1px solid #374151;
+    background:#0e1018;
+    position:relative;
+    overflow:hidden;
+    transition: transform .18s, box-shadow .18s;
+  }
+  .project-card:hover {
+    transform: translate(-3px,-3px);
+    box-shadow: 6px 6px 0 #1f2937, 10px 10px 0 #0a0a0e;
+  }
+  .card-bar {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:4px 8px; background:#1e293b;
+  }
+  .card-title-sm { font-family:'Press Start 2P',monospace; font-size:6px; color:#9ca3af; }
+  .card-dots { display:flex; gap:3px; }
+  .card-thumb {
+    height:80px; display:flex; align-items:center; justify-content:center;
+    background:#12151f; border-bottom:1px solid #1f2937;
+    font-size:36px;
+  }
+  .card-body { padding:12px; }
+  .card-desc { font-size:11px; color:#6b7280; line-height:1.6; margin-bottom:10px; }
+  .card-tags { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:10px; }
+  .card-tag {
+    font-family:'Press Start 2P',monospace; font-size:6px;
+    color:#4ade80; border:1px solid #14532d;
+    background:#052e16; padding:2px 6px;
+  }
+  .view-btn {
+    font-family:'Press Start 2P',monospace; font-size:6px;
+    color:#9ca3af; border:1px solid #374151;
+    background:#181b26; width:100%; padding:6px 0;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+    transition: color .15s, border-color .15s;
+  }
+  .view-btn:hover { color:#4ade80; border-color:#4ade80; }
+
+  /* Warning dialog */
+  .warning-overlay {
+    position:absolute; inset:0; z-index:20;
+    background:rgba(0,0,0,.6);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .warning-box {
+    border:2px solid #6b7280;
+    background:#1a1d28;
+    width:200px;
+    box-shadow:3px 3px 0 #111827;
+  }
+  .warn-bar {
+    display:flex; align-items:center; gap:6px;
+    padding:4px 8px; background:#1e3a8a;
+  }
+  .warn-title { font-family:'Press Start 2P',monospace; font-size:7px; color:#fff; }
+  .warn-close {
+    margin-left:auto; width:16px; height:16px;
+    border:1px solid #9ca3af; background:#374151;
+    color:#fff; font-size:10px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    line-height:1;
+  }
+  .warn-body { padding:14px 16px; text-align:center; }
+  .warn-msg { font-family:'Press Start 2P',monospace; font-size:8px; color:#fff; line-height:2; margin-bottom:14px; }
+  .warn-btns { display:flex; gap:10px; justify-content:center; }
+  .warn-btn {
+    font-family:'Press Start 2P',monospace; font-size:7px; color:#fff;
+    border:1px solid #6b7280; background:#2d3142;
+    padding:5px 16px; cursor:pointer;
+    box-shadow: inset -2px -2px 0 #374151, inset 2px 2px 0 #9ca3af;
+    transition: filter .1s;
+  }
+  .warn-btn:hover  { filter:brightness(1.2); }
+  .warn-btn:active { box-shadow:inset 2px 2px 0 #374151, inset -2px -2px 0 #9ca3af; transform:translate(1px,1px); }
+
+  /* ── Contact ── */
+  .contact-inner {
+    display:flex; flex-direction:column; align-items:center;
+    gap:20px; padding:28px 20px;
+  }
+  .contact-links { display:flex; gap:36px; justify-content:center; }
+  .contact-link  { display:flex; flex-direction:column; align-items:center; gap:8px; text-decoration:none; }
+  .contact-icon-box {
+    padding:12px; border:1px solid #374151; background:#181b26;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .contact-link:hover .contact-icon-box { transform:translateY(-5px); }
+  .contact-lbl { font-family:'Press Start 2P',monospace; font-size:6px; color:#374151; }
+  .footer-txt   { font-family:'Press Start 2P',monospace; font-size:6px; color:#1f2937; text-align:center; line-height:2.2; }
+
+  /* Icon colors */
+  .ic-mail { color:#f87171; box-shadow:0 0 12px #f8717133; }
+  .ic-gh   { color:#a78bfa; box-shadow:0 0 12px #a78bfa33; }
+  .ic-li   { color:#60a5fa; box-shadow:0 0 12px #60a5fa33; }
+
+  /* Pixel SVG assets */
+  svg.pixel-svg { image-rendering: pixelated; shape-rendering: crispEdges; }
+</style>
+</head>
+<body>
+
+<!-- ═══ LOADING BAR ═══ -->
+<div id="loading-wrap" class="fade-in">
+  <div class="bar-track"><div class="bar-fill"></div></div>
+  <p id="load-txt">LOADING...<span class="blink">▌</span></p>
+</div>
+
+<div class="container">
+
+  <!-- ═══ HERO ═══ -->
+  <section id="hero">
+    <div class="window scanlines">
+      <div class="win-bar">
+        <span class="win-title">STUDENT_PORTFOLIO.EXE</span>
+        <div class="win-dots">
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="dot" style="background:#ef4444"></div>
+        </div>
+      </div>
+
+      <div class="hero-inner">
+
+        <!-- Floating cursors -->
+        <span class="deco f-up-1"   style="top:12px;  left:18px;">
+          <svg class="pixel-svg" width="32" height="44" viewBox="0 0 10 14"><rect x="0" y="0" width="2" height="12" fill="#60a5fa"/><rect x="2" y="2" width="2" height="7" fill="#60a5fa"/><rect x="4" y="4" width="2" height="5" fill="#60a5fa"/><rect x="6" y="6" width="2" height="3" fill="#60a5fa"/><rect x="2" y="9" width="2" height="2" fill="#60a5fa"/><rect x="4" y="11" width="4" height="2" fill="#60a5fa"/></svg>
+        </span>
+        <span class="deco f-up-2"   style="top:60px; left:64px; opacity:.45;">
+          <svg class="pixel-svg" width="20" height="28" viewBox="0 0 10 14"><rect x="0" y="0" width="2" height="12" fill="#93c5fd"/><rect x="2" y="2" width="2" height="7" fill="#93c5fd"/><rect x="4" y="4" width="2" height="5" fill="#93c5fd"/><rect x="6" y="6" width="2" height="3" fill="#93c5fd"/></svg>
+        </span>
+        <span class="deco f-up-3"   style="bottom:40px; left:10px; opacity:.35;">
+          <svg class="pixel-svg" width="16" height="22" viewBox="0 0 10 14"><rect x="0" y="0" width="2" height="12" fill="#4ade80"/><rect x="2" y="2" width="2" height="7" fill="#4ade80"/><rect x="4" y="4" width="2" height="5" fill="#4ade80"/></svg>
+        </span>
+
+        <!-- Stars -->
+        <span class="deco sparkle"  style="top:10px;  right:36px;">
+          <svg class="pixel-svg" width="36" height="36" viewBox="0 0 16 16"><rect x="6" y="0" width="4" height="4" fill="#fde68a"/><rect x="4" y="2" width="8" height="4" fill="#fde68a"/><rect x="0" y="6" width="16" height="4" fill="#fde68a"/><rect x="2" y="4" width="12" height="8" fill="#fde68a"/><rect x="1" y="9" width="3" height="3" fill="#fde68a"/><rect x="12" y="9" width="3" height="3" fill="#fde68a"/></svg>
+        </span>
+        <span class="deco sparkle2" style="top:56px; right:90px; opacity:.7;">
+          <svg class="pixel-svg" width="20" height="20" viewBox="0 0 16 16"><rect x="6" y="0" width="4" height="4" fill="#fef9c3"/><rect x="4" y="2" width="8" height="4" fill="#fef9c3"/><rect x="0" y="6" width="16" height="4" fill="#fef9c3"/><rect x="2" y="4" width="12" height="8" fill="#fef9c3"/></svg>
+        </span>
+
+        <!-- Hearts -->
+        <span class="deco f-down-1" style="bottom:50px; left:50px;">
+          <svg class="pixel-svg" width="26" height="24" viewBox="0 0 14 13"><rect x="1" y="1" width="3" height="3" fill="#f9a8d4"/><rect x="8" y="1" width="3" height="3" fill="#f9a8d4"/><rect x="0" y="2" width="5" height="5" fill="#f9a8d4"/><rect x="7" y="2" width="5" height="5" fill="#f9a8d4"/><rect x="1" y="6" width="12" height="4" fill="#f9a8d4"/><rect x="2" y="9" width="10" height="2" fill="#f9a8d4"/><rect x="4" y="10" width="6" height="2" fill="#f9a8d4"/></svg>
+        </span>
+        <span class="deco f-down-2" style="bottom:60px; right:20px;">
+          <svg class="pixel-svg" width="18" height="16" viewBox="0 0 14 13"><rect x="1" y="1" width="3" height="3" fill="#c4b5fd"/><rect x="8" y="1" width="3" height="3" fill="#c4b5fd"/><rect x="0" y="2" width="5" height="5" fill="#c4b5fd"/><rect x="7" y="2" width="5" height="5" fill="#c4b5fd"/><rect x="1" y="6" width="12" height="4" fill="#c4b5fd"/><rect x="2" y="9" width="10" height="2" fill="#c4b5fd"/><rect x="4" y="10" width="6" height="2" fill="#c4b5fd"/></svg>
+        </span>
+
+        <p class="hero-sys" style="position:relative;z-index:3">&gt;&gt;&gt; SYSTEM READY</p>
+        <h1 class="hero-name" style="position:relative;z-index:3">
+          HI, I'M<br/>
+          <span>ALEX CHEN</span>
+        </h1>
+        <p class="hero-role" style="position:relative;z-index:3">Student Developer · UI/UX Enthusiast</p>
+        <p class="hero-sub"  style="position:relative;z-index:3">Building cool things — one commit at a time</p>
+        <a href="#" class="start-btn" style="position:relative;z-index:3">&#9660; DOWNLOAD RESUME</a>
+        <p class="hero-copy" style="position:relative;z-index:3">© 2025 ALEX_CHEN — ALL RIGHTS RESERVED</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SKILLS ═══ -->
+  <section>
+    <div class="window">
+      <div class="win-bar" style="background:#1e293b">
+        <span class="win-title">SKILLS.DAT</span>
+        <div class="win-dots">
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="dot" style="background:#ef4444"></div>
+        </div>
+      </div>
+      <div style="padding:20px 22px">
+        <div class="section-head">
+          <!-- Gamepad pixel icon -->
+          <svg class="pixel-svg" width="18" height="14" viewBox="0 0 18 14" fill="#4ade80">
+            <rect x="0"  y="4" width="18" height="6"/><rect x="1" y="2" width="16" height="10"/>
+            <rect x="2"  y="1" width="5"  height="12"/><rect x="11" y="1" width="5" height="12"/>
+            <rect x="3"  y="5" width="3"  height="4" fill="#0c0c10"/>
+            <rect x="4"  y="4" width="1"  height="6" fill="#4ade80"/>
+            <rect x="3"  y="6" width="3"  height="2" fill="#4ade80"/>
+            <rect x="12" y="5" width="1"  height="4" fill="#0c0c10"/>
+            <rect x="14" y="5" width="1"  height="4" fill="#0c0c10"/>
+            <rect x="12" y="7" width="3"  height="1" fill="#0c0c10"/>
+            <rect x="13" y="5" width="1"  height="4" fill="#4ade80"/>
+            <rect x="12" y="7" width="3"  height="2" fill="#4ade80"/>
+          </svg>
+          <span class="section-title">TECH_STACK</span>
+          <span class="section-sub">[12 modules]</span>
+        </div>
+        <div class="tags">
+          <span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">JavaScript</span>
+          <span class="tag">Python</span><span class="tag">Tailwind CSS</span><span class="tag">Node.js</span>
+          <span class="tag">GitHub</span><span class="tag">HTML/CSS</span><span class="tag">SQL</span>
+          <span class="tag">Figma</span><span class="tag">REST APIs</span><span class="tag">Git</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PROJECTS ═══ -->
+  <section>
+    <div class="window">
+      <div class="win-bar" style="background:#1e293b">
+        <span class="win-title">PROJECTS.DIR</span>
+        <div class="win-dots">
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="dot" style="background:#ef4444"></div>
+        </div>
+      </div>
+      <div style="padding:20px 22px">
+        <div class="section-head">
+          <!-- Folder pixel icon -->
+          <svg class="pixel-svg" width="20" height="16" viewBox="0 0 20 16" fill="#facc15">
+            <rect x="0"  y="4"  width="20" height="12"/>
+            <rect x="0"  y="2"  width="8"  height="4"/>
+            <rect x="1"  y="1"  width="6"  height="2"/>
+          </svg>
+          <span class="section-title">MY_PROJECTS</span>
+        </div>
+
+        <div class="projects-grid">
+
+          <!-- Card 1 -->
+          <div class="project-card">
+            <div class="card-bar">
+              <span class="card-title-sm">PORTFOLIO.EXE</span>
+              <div class="card-dots">
+                <div class="dot" style="width:7px;height:7px;background:#eab308"></div>
+                <div class="dot" style="width:7px;height:7px;background:#22c55e"></div>
+                <div class="dot" style="width:7px;height:7px;background:#ef4444"></div>
+              </div>
+            </div>
+            <div class="card-thumb">🌐</div>
+            <div class="card-body">
+              <p class="card-desc">Personal portfolio with pixel-art aesthetic, smooth animations, and responsive layout.</p>
+              <div class="card-tags">
+                <span class="card-tag">React</span>
+                <span class="card-tag">Tailwind</span>
+                <span class="card-tag">JS</span>
+              </div>
+              <button class="view-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                VIEW PROJECT
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2 — WARNING dialog -->
+          <div class="project-card" id="card-warn">
+            <div class="card-bar">
+              <span class="card-title-sm">WEATHER_APP.EXE</span>
+              <div class="card-dots">
+                <div class="dot" style="width:7px;height:7px;background:#eab308"></div>
+                <div class="dot" style="width:7px;height:7px;background:#22c55e"></div>
+                <div class="dot" style="width:7px;height:7px;background:#ef4444"></div>
+              </div>
+            </div>
+            <div class="card-thumb">⛅</div>
+            <div class="card-body">
+              <p class="card-desc">Real-time weather dashboard powered by OpenWeather API. Forecasts, humidity &amp; wind.</p>
+              <div class="card-tags">
+                <span class="card-tag">Python</span>
+                <span class="card-tag">API</span>
+                <span class="card-tag">CSS</span>
+              </div>
+              <button class="view-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                VIEW PROJECT
+              </button>
+            </div>
+
+            <!-- WARNING overlay -->
+            <div class="warning-overlay" id="warning-overlay">
+              <div class="warning-box">
+                <div class="warn-bar">
+                  <span style="color:#fbbf24;font-size:13px;">⚠</span>
+                  <span class="warn-title">WARNING</span>
+                  <button class="warn-close" onclick="dismissWarning()">×</button>
+                </div>
+                <div class="warn-body">
+                  <p class="warn-msg">VIEW SOURCE<br/>CODE?</p>
+                  <div class="warn-btns">
+                    <button class="warn-btn" onclick="dismissWarning()">Yes</button>
+                    <button class="warn-btn" onclick="dismissWarning()">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="project-card">
+            <div class="card-bar">
+              <span class="card-title-sm">TASKMASTER.EXE</span>
+              <div class="card-dots">
+                <div class="dot" style="width:7px;height:7px;background:#eab308"></div>
+                <div class="dot" style="width:7px;height:7px;background:#22c55e"></div>
+                <div class="dot" style="width:7px;height:7px;background:#ef4444"></div>
+              </div>
+            </div>
+            <div class="card-thumb">✅</div>
+            <div class="card-body">
+              <p class="card-desc">Full-stack task manager with JWT auth, drag-and-drop boards, and real-time sync.</p>
+              <div class="card-tags">
+                <span class="card-tag">Node.js</span>
+                <span class="card-tag">SQL</span>
+                <span class="card-tag">React</span>
+              </div>
+              <button class="view-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                VIEW PROJECT
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CONTACT ═══ -->
+  <section>
+    <div class="window" style="margin-bottom:40px">
+      <div class="win-bar" style="background:#1e293b">
+        <span class="win-title">CONTACT.EXE</span>
+        <div class="win-dots">
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="dot" style="background:#ef4444"></div>
+        </div>
+      </div>
+      <div class="contact-inner">
+        <div class="section-head" style="margin-bottom:0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="square"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span class="section-title">GET_IN_TOUCH</span>
+        </div>
+        <p class="mono" style="color:#4b5563;font-size:13px;text-align:center">
+          Open to internships, collabs, and cool side projects.
+        </p>
+        <div class="contact-links">
+          <a href="mailto:alex@example.com" class="contact-link">
+            <div class="contact-icon-box ic-mail">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <span class="contact-lbl">EMAIL</span>
+          </a>
+          <a href="#" class="contact-link">
+            <div class="contact-icon-box ic-gh">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </div>
+            <span class="contact-lbl">GITHUB</span>
+          </a>
+          <a href="#" class="contact-link">
+            <div class="contact-icon-box ic-li">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </div>
+            <span class="contact-lbl">LINKEDIN</span>
+          </a>
+        </div>
+        <p class="footer-txt">
+          &gt; ALEX_CHEN.EXE — BUILT WITH HTML + CSS + JS<br/>
+          &gt; v1.0.0 — 2025
+        </p>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /container -->
+
+<script>
+  function dismissWarning() {
+    document.getElementById('warning-overlay').style.display = 'none';
+  }
+</script>
+</body>
+</html>
