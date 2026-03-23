@@ -12,29 +12,8 @@
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #0c0c10;
-      color: #e2e8f0;
-      font-family: 'Share Tech Mono', monospace;
-      min-height: 100vh;
-      background-attachment: fixed;
-      isolation: isolate;
-    }
-    body.admin-active { padding-top: 50px; }
-    body::before{
-      content:'';
-      position:fixed;
-      inset:-60px;
-      z-index:-1;
-      pointer-events:none;
-      filter: blur(35px);
-      opacity:.9;
-      background:
-        radial-gradient(ellipse 60% 50% at 75% 10%, rgba(167,139,250,.22) 0%, transparent 60%),
-        radial-gradient(ellipse 45% 35% at 15% 85%, rgba(52,211,153,.18) 0%, transparent 60%),
-        radial-gradient(ellipse 55% 40% at 40% 55%, rgba(30,58,138,.14) 0%, transparent 62%);
-      animation: driftBg 12s ease-in-out infinite;
-    }
+body { background: #0c0c10; color: #e2e8f0; font-family: 'Share Tech Mono', monospace; min-height: 100vh; }
+body.admin-active { padding-top: 50px; }
 
 /* ── Admin Bar ── */
 #admin-bar {
@@ -115,10 +94,7 @@ body.edit-mode #add-proj-btn { display:block; }
 /* ── Animations ── */
 @keyframes fadeIn    { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
-@keyframes glowPulse { 0%,100%{box-shadow:0 0 4px #4ade8033,inset -3px -3px 0 #166534,inset 3px 3px 0 #86efac} 50%{box-shadow:0 0 10px #4ade8055,inset -3px -3px 0 #166534,inset 3px 3px 0 #86efac} }
-@keyframes driftBg { 0%,100%{ transform: translate3d(0,0,0) } 50%{ transform: translate3d(18px,-10px,0) } }
-@keyframes avatarIn { from{ opacity:0; filter: blur(6px) } to{ opacity:1; filter: blur(0) } }
-@keyframes avatarFloat { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-6px) } }
+@keyframes glowPulse { 0%,100%{box-shadow:0 0 8px #4ade8066,inset -4px -4px 0 #166534,inset 4px 4px 0 #86efac} 50%{box-shadow:0 0 28px #4ade80aa,inset -4px -4px 0 #166534,inset 4px 4px 0 #86efac} }
 .fade-in { animation: fadeIn .7s ease-out forwards; }
 
 /* ── Layout ── */
@@ -132,86 +108,11 @@ body.edit-mode #add-proj-btn { display:block; }
 .scanlines::after { content:''; position:absolute; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.07) 3px,rgba(0,0,0,.07) 4px); pointer-events:none; z-index:1; }
 
 /* ── Hero ── */
-.hero-inner { position:relative; display:flex; flex-direction:column; padding:0; gap:0; text-align:left; }
-.hero-banner {
-  position:relative;
-  height: 160px;
-  background:#0b1020;
-  border-bottom:1px solid #1f2937;
-  overflow:hidden;
-}
-.hero-banner img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:none;
-  filter:saturate(1.1) contrast(1.05);
-}
-.hero-banner::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background: linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.72) 100%);
-  pointer-events:none;
-}
-.hero-content {
-  position:relative;
-  z-index:3;
-  display:grid;
-  grid-template-columns: 1.15fr .85fr;
-  gap: 18px;
-  padding: 18px 22px 24px;
-}
-.hero-left { display:flex; flex-direction:column; align-items:flex-start; }
-.hero-left, .hero-right { position: relative; z-index: 4; }
-.hero-right {
-  border:1px solid #374151;
-  background:#0e1018;
-  box-shadow: 3px 3px 0 #111827;
-  padding:14px 14px 12px;
-}
-.hero-badge { font-family:'Press Start 2P',monospace; font-size:8px; color:#374151; margin-bottom:10px; }
-.hero-right .mini-ttl { font-family:'Press Start 2P',monospace; font-size:8px; color:#fff; margin-bottom:10px; }
-.kv { font-size:12px; color:#6b7280; line-height:1.85; }
-.kv b { color:#4ade80; font-weight:700; }
-.kv .val { color:#cbd5e1; }
-@media (max-width: 720px){
-  .hero-banner { height: 130px; }
-  .hero-content { grid-template-columns: 1fr; }
-  .hero-right { margin-top: 4px; }
-}
-#profile-pic {
-  width:90px;
-  height:90px;
-  object-fit:cover;
-  border:3px solid #4ade80;
-  display:none;
-  margin-bottom:6px;
-  border-radius: 9999px;
-  box-shadow: 0 0 18px rgba(74,222,128,.18);
-  animation: avatarIn .7s ease-out both, avatarFloat 4.2s ease-in-out infinite;
-}
-.avatar-wrap{
-  margin-top: -58px;
-  display:flex;
-  align-items:flex-end;
-  gap: 12px;
-}
-.avatar-ring{
-  width: 104px;
-  height: 104px;
-  border-radius: 9999px;
-  background: rgba(16,18,26,.92);
-  border: 3px solid rgba(74,222,128,.45);
-  box-shadow: 0 0 22px rgba(74,222,128,.16);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+.hero-inner { position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; padding:52px 24px; gap:14px; }
+#profile-pic { width:90px; height:90px; object-fit:cover; border:3px solid #4ade80; display:none; margin-bottom:6px; }
 .start-btn { font-family:'Press Start 2P',monospace; font-size:11px; letter-spacing:2px; color:#fff; background:#16a34a; border:3px solid #14532d; padding:13px 30px; cursor:pointer; animation:glowPulse 2.4s ease-in-out infinite; margin-top:8px; transition:filter .1s; text-decoration:none; display:inline-block; }
 .start-btn:hover { filter:brightness(1.18); }
 .start-btn:active { transform:translate(2px,2px); animation:none; }
-.edit-pencil { position: relative; z-index: 30; pointer-events: auto; }
 
 /* ── Skills ── */
 .tags { display:flex; flex-wrap:wrap; gap:8px; }
@@ -258,9 +159,23 @@ body.edit-mode #add-proj-btn { display:block; }
 .ic-gh   { color:#a78bfa; box-shadow:0 0 12px #a78bfa33; }
 .ic-li   { color:#60a5fa; box-shadow:0 0 12px #60a5fa33; }
 svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
+
+/* ── Sakura Canvas ── */
+#sakuraCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
+
+<!-- ── Sakura Canvas ── -->
+<canvas id="sakuraCanvas"></canvas>
 
 <!-- ── Admin Bar ── -->
 <div id="admin-bar">
@@ -330,48 +245,19 @@ svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
         </div>
       </div>
       <div class="hero-inner">
-        <div class="hero-banner">
-          <img id="hero-banner-img" src="" alt="Banner"/>
+        <img id="profile-pic" src="" alt="Profile Photo"/>
+        <p style="font-family:'Press Start 2P',monospace;font-size:8px;color:#374151;position:relative;z-index:3">&gt;&gt;&gt; SYSTEM READY</p>
+        <div class="editable-zone" style="position:relative;z-index:3;width:100%">
+          <button class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
+          <h1 style="font-family:'Press Start 2P',monospace;font-size:clamp(14px,3vw,22px);line-height:1.9;color:#fff">
+            HI, I'M<br/>
+            <span id="d-name" style="color:#4ade80;text-shadow:0 0 24px #4ade8055">YOUR NAME</span>
+          </h1>
+          <p id="d-role" style="font-size:15px;color:#6b7280;margin-top:10px">Student Developer · UI/UX Enthusiast</p>
+          <p id="d-sub"  style="font-size:12px;color:#374151;margin-top:6px">Building cool things — one commit at a time</p>
+          <a id="d-resume" href="#" class="start-btn" style="margin-top:16px">&#9660; DOWNLOAD RESUME</a>
         </div>
-
-        <div class="hero-content">
-          <div class="hero-left">
-            <div class="editable-zone" style="width:100%">
-              <button type="button" class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
-            </div>
-
-            <div class="avatar-wrap">
-              <div class="avatar-ring">
-                <img id="profile-pic" src="" alt="Profile Photo"/>
-              </div>
-            </div>
-
-            <p class="hero-badge">&gt;&gt;&gt; SYSTEM READY</p>
-
-            <div class="editable-zone" style="width:100%">
-              <h1 style="font-family:'Press Start 2P',monospace;font-size:clamp(14px,3vw,22px);line-height:1.9;color:#fff">
-                HI, I'M<br/>
-                <span id="d-name" style="color:#4ade80;text-shadow:0 0 24px #4ade8055">YOUR NAME</span>
-              </h1>
-              <p id="d-role" style="font-size:15px;color:#6b7280;margin-top:10px">Student Developer · UI/UX Enthusiast</p>
-              <p id="d-sub"  style="font-size:12px;color:#374151;margin-top:6px">Building cool things — one commit at a time</p>
-              <a id="d-resume" href="#" class="start-btn" style="margin-top:16px">&#9660; DOWNLOAD RESUME</a>
-              <p style="font-family:'Press Start 2P',monospace;font-size:6px;color:#1f2937;margin-top:12px">© 2025 PORTFOLIO — ALL RIGHTS RESERVED</p>
-            </div>
-          </div>
-
-          <div class="hero-right">
-            <div class="editable-zone">
-              <button type="button" class="edit-pencil" onclick="openEducationEdit()">✏ EDIT EDUCATION</button>
-            </div>
-            <div class="mini-ttl">COLLEGE_DETAILS</div>
-            <div class="kv">
-              <div><b>COLLEGE:</b> <span class="val" id="d-college"></span></div>
-              <div><b>CGPA:</b> <span class="val" id="d-cgpa"></span></div>
-              <div style="margin-top:6px"><b>DEGREES:</b><br/><span class="val" id="d-degrees" style="white-space:pre-wrap; word-break:break-word;"></span></div>
-            </div>
-          </div>
-        </div>
+        <p style="font-family:'Press Start 2P',monospace;font-size:6px;color:#1f2937;margin-top:10px;position:relative;z-index:3">© 2025 PORTFOLIO — ALL RIGHTS RESERVED</p>
       </div>
     </div>
   </section>
@@ -462,36 +348,6 @@ svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
 
 <!-- ══════════ SCRIPT ══════════ -->
 <script>
-// Convert Google Drive "share" links into direct image URLs that browsers can load as <img>.
-function getDriveImageUrls(url) {
-  const u = String(url || "").trim();
-  if (!u) return [];
-  if (!u.includes("drive.google.com")) return [];
-
-  // Supported formats:
-  // - https://drive.google.com/file/d/FILE_ID/view?usp=sharing
-  // - https://drive.google.com/open?id=FILE_ID
-  // - https://drive.google.com/uc?export=view&id=FILE_ID
-  const fileId =
-    (u.match(/\/file\/d\/([^\/?#]+)/i) || [])[1] ||
-    (u.match(/[?&]id=([^&]+)/i) || [])[1];
-
-  if (!fileId) return [];
-  return [
-    // "view" usually works, but some Drive links fail and require "download".
-    `https://drive.google.com/uc?export=view&id=${fileId}`,
-    `https://drive.google.com/uc?export=download&id=${fileId}`,
-  ];
-}
-function normalizeProfileImageUrl(url) {
-  const u = String(url || "").trim();
-  if (!u) return "";
-
-  if (!u.includes("drive.google.com")) return u;
-  const urls = getDriveImageUrls(u);
-  return urls[0] || u;
-}
-
 const ADMIN_EMAIL = 'aditya7karale@gmail.com';
 
 firebase.initializeApp({
@@ -508,8 +364,7 @@ const db   = firebase.database();
 
 // Default data
 const DEFAULTS = {
-  hero:     { name:"YOUR NAME", role:"Student Developer · UI/UX Enthusiast", sub:"Building cool things — one commit at a time", resumeUrl:"#", profilePic:"", bannerUrl:"" },
-  education:{ collegeName:"", cgpa:"", degrees:"" },
+  hero:     { name:"YOUR NAME", role:"Student Developer · UI/UX Enthusiast", sub:"Building cool things — one commit at a time", resumeUrl:"#", profilePic:"" },
   skills:   ["React","TypeScript","JavaScript","Python","Tailwind CSS","Node.js","GitHub","HTML/CSS","SQL","Figma"],
   projects: [
     { title:"PORTFOLIO.EXE",   emoji:"🌐", desc:"Personal portfolio with pixel-art aesthetic and animations.",  tags:["React","Tailwind","JS"],  link:"#", showWarning:false },
@@ -529,7 +384,6 @@ db.ref('portfolio').once('value').then(snap => {
     const d = snap.val();
     DATA = {
       hero:     d.hero     || DEFAULTS.hero,
-      education:d.education|| DEFAULTS.education,
       skills:   d.skills   || DEFAULTS.skills,
       projects: d.projects || DEFAULTS.projects,
       contact:  d.contact  || DEFAULTS.contact
@@ -539,7 +393,7 @@ db.ref('portfolio').once('value').then(snap => {
 });
 
 // ── Render ──────────────────────────────────────────────────────────────────
-function renderAll() { renderHero(); renderSkills(); renderProjects(); renderEducation(); renderContact(); }
+function renderAll() { renderHero(); renderSkills(); renderProjects(); renderContact(); }
 
 function renderHero() {
   const h = DATA.hero;
@@ -547,61 +401,9 @@ function renderHero() {
   document.getElementById('d-role').textContent = h.role || '';
   document.getElementById('d-sub').textContent  = h.sub  || '';
   document.getElementById('d-resume').href      = h.resumeUrl || '#';
-
-  // Banner
-  const banner = document.getElementById('hero-banner-img');
-  const rawBanner = h.bannerUrl || h.banner || h.banner_url || '';
-  const bannerDriveUrls = getDriveImageUrls(rawBanner);
-  const normalizedBanner = normalizeProfileImageUrl(rawBanner);
-  if (normalizedBanner) {
-    banner.style.display = 'block';
-    banner.src = normalizedBanner;
-    banner.onerror = () => {
-      const next = (bannerDriveUrls || []).find(u => u && u !== banner.src);
-      if (next) { banner.src = next; return; }
-      banner.style.display = 'none';
-    };
-  } else {
-    banner.style.display = 'none';
-    banner.src = '';
-    banner.onerror = null;
-  }
-
   const pic = document.getElementById('profile-pic');
-  const rawPic =
-    h.profilePic ||
-    h.profile_pic ||
-    h.profilePicUrl ||
-    h.profile_photo ||
-    '';
-  const driveUrls = getDriveImageUrls(rawPic);
-  const normalized = normalizeProfileImageUrl(rawPic);
-
-  if (normalized) {
-    pic.style.display = 'block';
-    pic.src = normalized;
-
-    // If the first Drive URL variant fails, try a second one.
-    pic.onerror = () => {
-      const next = (driveUrls || []).find(u => u && u !== pic.src);
-      if (next) {
-        pic.src = next;
-        return;
-      }
-      pic.style.display = 'none';
-    };
-  } else {
-    pic.style.display = 'none';
-    pic.src = '';
-    pic.onerror = null;
-  }
-}
-
-function renderEducation() {
-  const ed = DATA.education || DEFAULTS.education;
-  document.getElementById('d-college').textContent = ed.collegeName || '';
-  document.getElementById('d-cgpa').textContent = ed.cgpa || '';
-  document.getElementById('d-degrees').textContent = ed.degrees || ed.collegeAddress || '';
+  if (h.profilePic) { pic.src = h.profilePic; pic.style.display = 'block'; }
+  else { pic.style.display = 'none'; }
 }
 
 function renderSkills() {
@@ -732,11 +534,6 @@ function openHeroEdit() {
       <input class="form-input" id="f-sub" value="${esc(h.sub)}"/>
     </div>
     <div class="form-group">
-      <label class="form-label">BANNER IMAGE URL</label>
-      <input class="form-input" id="f-banner" value="${esc(h.bannerUrl)}" placeholder="https://..."/>
-      <p class="form-hint">Tip: use an image URL (or Google Drive share link). The banner will crop to fit.</p>
-    </div>
-    <div class="form-group">
       <label class="form-label">RESUME DOWNLOAD LINK</label>
       <input class="form-input" id="f-resume" value="${esc(h.resumeUrl)}" placeholder="https://drive.google.com/..."/>
       <p class="form-hint">Paste a Google Drive or Dropbox direct download link.</p>
@@ -751,7 +548,6 @@ function openHeroEdit() {
       name:       document.getElementById('f-name').value,
       role:       document.getElementById('f-role').value,
       sub:        document.getElementById('f-sub').value,
-      bannerUrl:  document.getElementById('f-banner').value,
       resumeUrl:  document.getElementById('f-resume').value,
       profilePic: document.getElementById('f-pic').value
     };
@@ -771,34 +567,6 @@ function openSkillsEdit() {
   `, () => {
     DATA.skills = document.getElementById('f-skills').value
       .split('\n').map(s=>s.trim()).filter(Boolean);
-    save();
-  });
-}
-
-// ── Edit: Education ─────────────────────────────────────────────────────────
-function openEducationEdit() {
-  if (!isAdmin) return;
-  const ed = DATA.education || DEFAULTS.education;
-  openModal('EDIT EDUCATION', `
-    <div class="form-group">
-      <label class="form-label">COLLEGE NAME</label>
-      <input class="form-input" id="f-college" value="${esc(ed.collegeName)}" placeholder="e.g. Your College Name"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">CGPA</label>
-      <input class="form-input" id="f-cgpa" value="${esc(ed.cgpa)}" placeholder="e.g. 8.65"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">DEGREES</label>
-      <textarea class="form-textarea" id="f-degrees" style="min-height:90px">${esc(ed.degrees || ed.collegeAddress || '')}</textarea>
-      <p class="form-hint">Supports multiple lines.</p>
-    </div>
-  `, () => {
-    DATA.education = {
-      collegeName:    document.getElementById('f-college').value,
-      cgpa:           document.getElementById('f-cgpa').value,
-      degrees:        document.getElementById('f-degrees').value
-    };
     save();
   });
 }
@@ -914,6 +682,120 @@ function setLoginErr(m)    { document.getElementById('login-err').textContent = 
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ── Sakura Glitch Effect ──────────────────────────────────────────────────────
+const canvas = document.getElementById('sakuraCanvas');
+const ctx = canvas.getContext('2d', { alpha: true });
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Sakura {
+  constructor() {
+    this.reset();
+    this.y = Math.random() * canvas.height; // random start across screen
+  }
+
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * -100 - 20;
+    this.size = Math.random() * 5 + 4;
+    this.speedY = Math.random() * 1.5 + 0.5;
+    this.speedX = Math.random() * 1.5 - 0.75;
+    this.angle = Math.random() * Math.PI * 2;
+    this.spin = (Math.random() - 0.5) * 0.05;
+    this.opacity = Math.random() * 0.4 + 0.2;
+    
+    // Glitch properties
+    this.isGlitching = false;
+    this.glitchTimer = 0;
+  }
+
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX + Math.sin(this.angle) * 1.2; // sway
+    this.angle += this.spin;
+
+    if (this.y > canvas.height + 30) {
+      this.reset();
+    }
+
+    // Random glitch trigger
+    if (!this.isGlitching && Math.random() < 0.002) {
+      this.isGlitching = true;
+      this.glitchTimer = Math.random() * 10 + 5; // Glitch duration frames
+    }
+
+    if (this.isGlitching) {
+      this.glitchTimer--;
+      if (this.glitchTimer <= 0) {
+        this.isGlitching = false;
+      }
+    }
+  }
+
+  draw() {
+    ctx.save();
+    
+    let currentX = this.x;
+    let currentY = this.y;
+    let currentOp = this.opacity;
+
+    if (this.isGlitching) {
+      if (Math.random() < 0.3) currentX += (Math.random() - 0.5) * 30; // X displacement
+      if (Math.random() < 0.3) currentY += (Math.random() - 0.5) * 10; // Y displacement
+      if (Math.random() < 0.4) currentOp = Math.random() * 0.2 + 0.1;  // opacity drop/flicker
+    }
+
+    ctx.translate(currentX, currentY);
+    ctx.rotate(this.angle);
+
+    if (this.isGlitching && Math.random() < 0.4) {
+      // Chromatic aberration (red & cyan separation)
+      ctx.fillStyle = "rgba(255, 0, 80, " + currentOp + ")";
+      this.drawPetal(5, 0);
+      ctx.fillStyle = "rgba(0, 255, 255, " + currentOp + ")";
+      this.drawPetal(-5, 0);
+    } else {
+      ctx.fillStyle = "rgba(255, 183, 197, " + currentOp + ")";
+      this.drawPetal(0, 0);
+    }
+
+    ctx.restore();
+  }
+
+  drawPetal(x, y) {
+     ctx.beginPath();
+     // stylized petal curve
+     ctx.moveTo(x, y - this.size);
+     ctx.bezierCurveTo(x + this.size, y - this.size * 0.5, x + this.size * 0.5, y + this.size, x, y + this.size);
+     ctx.bezierCurveTo(x - this.size * 0.5, y + this.size, x - this.size, y - this.size * 0.5, x, y - this.size);
+     ctx.fill();
+  }
+}
+
+const sakuras = [];
+const particleCount = Math.min(Math.floor(window.innerWidth / 15), 100); 
+for (let i = 0; i < particleCount; i++) {
+  sakuras.push(new Sakura());
+}
+
+function animateSakura() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  sakuras.forEach(s => {
+    s.update();
+    s.draw();
+  });
+
+  requestAnimationFrame(animateSakura);
+}
+
+animateSakura();
 </script>
 </body>
 </html>
