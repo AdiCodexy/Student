@@ -1211,7 +1211,7 @@
 
         // Default data
         const DEFAULTS = {
-            hero: { name: "YOUR NAME", role: "Student Developer · UI/UX Enthusiast", sub: "Building cool things — one commit at a time", resumeUrl: "#", profilePic: "", bannerUrl: "" },
+            hero: { name: "YOUR NAME", role: "Student Developer · UI/UX Enthusiast", sub: "Building cool things — one commit at a time", resumeUrl: "#", profilePic: "https://raw.githubusercontent.com/AdiCodexy/Student/main/MyProfilePic.jpg", bannerUrl: "https://raw.githubusercontent.com/AdiCodexy/Student/main/MyBannerPic.jpg" },
             edu: { college: "Your College", cgpa: "9.0", degrees: "Your Degree" },
             skills: ["React", "TypeScript", "JavaScript", "Python", "Tailwind CSS", "Node.js", "GitHub", "HTML/CSS", "SQL", "Figma"],
             projects: [
@@ -1258,28 +1258,32 @@
             document.getElementById('d-sub').textContent = h.sub || '';
             document.getElementById('d-resume').href = h.resumeUrl || '#';
 
+            const defaultBanner = "https://raw.githubusercontent.com/AdiCodexy/Student/main/MyBannerPic.jpg";
             const banner = document.getElementById('d-banner');
-            if (h.bannerUrl) {
+            if (h.bannerUrl && !h.bannerUrl.includes('drive.google.com')) {
                 banner.style.backgroundImage = `url('${h.bannerUrl}')`;
             } else {
-                banner.style.backgroundImage = 'none';
+                banner.style.backgroundImage = `url('${defaultBanner}')`;
             }
 
             const pic = document.getElementById('profile-pic');
+            const defaultPfp = "https://raw.githubusercontent.com/AdiCodexy/Student/main/MyProfilePic.jpg";
             const fallbackPic = "https://api.dicebear.com/7.x/pixel-art/svg?seed=Captain&backgroundColor=10121a";
 
-            if (h.profilePic) {
+            if (h.profilePic && !h.profilePic.includes('drive.google.com')) {
                 pic.src = h.profilePic;
-                pic.style.display = 'block';
-                pic.onerror = function () {
-                    if (this.src !== fallbackPic) {
-                        this.src = fallbackPic;
-                    }
-                };
             } else {
-                pic.src = fallbackPic;
-                pic.style.display = 'block';
+                pic.src = defaultPfp;
             }
+            pic.style.display = 'block';
+
+            pic.onerror = function () {
+                if (this.src !== defaultPfp && this.src !== fallbackPic) {
+                    this.src = defaultPfp;
+                } else if (this.src === defaultPfp) {
+                    this.src = fallbackPic;
+                }
+            };
         }
 
         function renderSkills() {
@@ -1746,4 +1750,4 @@
     </script>
 </body>
 
-  </html>
+</html>
