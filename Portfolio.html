@@ -2,1278 +2,1294 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio</title>
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap"
-    rel="stylesheet" />
-
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background: #0c0c10;
-      color: #e2e8f0;
-      font-family: 'Share Tech Mono', monospace;
-      min-height: 100vh;
-    }
-
-    body.admin-active {
-      padding-top: 50px;
-    }
-
-    /* ── Admin Bar ── */
-    #admin-bar {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background: #080b14;
-      border-bottom: 2px solid #1e3a8a;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 14px;
-    }
-
-    #admin-bar.on {
-      display: flex;
-    }
-
-    #admin-avatar {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 2px solid #4ade80;
-    }
-
-    #admin-email-lbl {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      color: #4ade80;
-    }
-
-    .abar-btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      border: 1px solid;
-      padding: 6px 10px;
-      cursor: pointer;
-      background: transparent;
-      transition: all .15s;
-    }
-
-    #edit-toggle {
-      color: #facc15;
-      border-color: #facc15;
-      margin-left: auto;
-    }
-
-    #edit-toggle.on {
-      background: #facc15;
-      color: #000;
-    }
-
-    #logout-btn {
-      color: #f87171;
-      border-color: #f87171;
-    }
-
-    #logout-btn:hover {
-      background: #f87171;
-      color: #000;
-    }
-
-    /* ── Admin Trigger Button ── */
-    #admin-trigger {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 900;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      background: #10121a;
-      border: 1px solid #374151;
-      color: #4b5563;
-      padding: 8px 12px;
-      cursor: pointer;
-      transition: all .2s;
-      box-shadow: 2px 2px 0 #1f2937;
-    }
-
-    #admin-trigger:hover {
-      border-color: #4ade80;
-      color: #4ade80;
-    }
-
-    /* ── Login Modal ── */
-    #login-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      background: rgba(0, 0, 0, .88);
-      align-items: center;
-      justify-content: center;
-    }
-
-    #login-modal.on {
-      display: flex;
-    }
-
-    #login-box {
-      background: #10121a;
-      border: 2px solid #374151;
-      width: 330px;
-      box-shadow: 6px 6px 0 #1f2937, 10px 10px 0 #0a0a0e;
-      overflow: hidden;
-      animation: slideDown .25s ease-out;
-    }
-
-    .modal-bar {
-      background: #1e3a8a;
-      padding: 7px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .modal-bar-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 8px;
-      color: #fff;
-    }
-
-    .modal-close {
-      background: #ef4444;
-      border: none;
-      color: #fff;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      font-size: 14px;
-      line-height: 1;
-    }
-
-    .login-body {
-      padding: 28px 24px;
-      text-align: center;
-    }
-
-    .login-body p {
-      font-size: 12px;
-      color: #6b7280;
-      margin-bottom: 22px;
-      line-height: 1.7;
-    }
-
-    #google-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      background: #fff;
-      color: #1f2937;
-      border: none;
-      padding: 12px 18px;
-      cursor: pointer;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      transition: filter .15s;
-    }
-
-    #google-btn:hover {
-      filter: brightness(.92);
-    }
-
-    #login-err {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      color: #f87171;
-      margin-top: 14px;
-      min-height: 16px;
-      line-height: 1.8;
-    }
-
-    /* ── Edit Modal ── */
-    #edit-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 1500;
-      background: rgba(0, 0, 0, .82);
-      align-items: center;
-      justify-content: center;
-    }
-
-    #edit-modal.on {
-      display: flex;
-    }
-
-    #edit-box {
-      background: #10121a;
-      border: 2px solid #374151;
-      box-shadow: 6px 6px 0 #1f2937;
-      width: 92%;
-      max-width: 520px;
-      max-height: 88vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      animation: slideDown .2s ease-out;
-    }
-
-    #edit-form-area {
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-label {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      color: #9ca3af;
-      display: block;
-      margin-bottom: 7px;
-    }
-
-    .form-input,
-    .form-textarea {
-      width: 100%;
-      background: #181b26;
-      border: 1px solid #374151;
-      color: #e2e8f0;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 13px;
-      padding: 9px 11px;
-      outline: none;
-      transition: border-color .15s;
-    }
-
-    .form-input:focus,
-    .form-textarea:focus {
-      border-color: #4ade80;
-    }
-
-    .form-textarea {
-      resize: vertical;
-      min-height: 90px;
-    }
-
-    .form-hint {
-      font-size: 10px;
-      color: #4b5563;
-      margin-top: 5px;
-      line-height: 1.6;
-    }
-
-    .edit-footer {
-      padding: 12px 20px;
-      border-top: 1px solid #1f2937;
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      flex-shrink: 0;
-    }
-
-    .btn-save {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      color: #fff;
-      background: #16a34a;
-      border: 2px solid #14532d;
-      padding: 9px 18px;
-      cursor: pointer;
-      box-shadow: inset -2px -2px 0 #166534, inset 2px 2px 0 #86efac;
-      transition: filter .1s;
-    }
-
-    .btn-save:hover {
-      filter: brightness(1.15);
-    }
-
-    .btn-cancel {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      background: transparent;
-      color: #9ca3af;
-      border: 1px solid #374151;
-      padding: 9px 14px;
-      cursor: pointer;
-    }
-
-    /* ── Edit Mode ── */
-    .editable-zone {
-      position: relative;
-    }
-
-    .edit-pencil {
-      display: none;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      background: #1e3a8a;
-      color: #fff;
-      border: 1px solid #3b82f6;
-      padding: 4px 9px;
-      cursor: pointer;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 8px;
-      transition: background .15s;
-    }
-
-    .edit-pencil:hover {
-      background: #2563eb;
-    }
-
-    body.edit-mode .edit-pencil {
-      display: inline-flex;
-    }
-
-    body.edit-mode .editable-zone {
-      outline: 1px dashed #1d4ed880;
-      outline-offset: 5px;
-    }
-
-    .proj-edit-row {
-      display: none;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    body.edit-mode .proj-edit-row {
-      display: flex;
-    }
-
-    .proj-btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      padding: 4px 9px;
-      border: 1px solid;
-      cursor: pointer;
-      background: transparent;
-      transition: all .12s;
-    }
-
-    .proj-btn.edit {
-      color: #60a5fa;
-      border-color: #60a5fa;
-    }
-
-    .proj-btn.edit:hover {
-      background: #60a5fa;
-      color: #000;
-    }
-
-    .proj-btn.del {
-      color: #f87171;
-      border-color: #f87171;
-    }
-
-    .proj-btn.del:hover {
-      background: #f87171;
-      color: #000;
-    }
-
-    #add-proj-btn {
-      display: none;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      background: #052e16;
-      color: #4ade80;
-      border: 1px dashed #166534;
-      padding: 12px;
-      width: 100%;
-      cursor: pointer;
-      margin-top: 12px;
-      transition: background .15s;
-    }
-
-    #add-proj-btn:hover {
-      background: #064e3b;
-    }
-
-    body.edit-mode #add-proj-btn {
-      display: block;
-    }
-
-    /* ── Toast ── */
-    #save-toast {
-      display: none;
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 3000;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 8px;
-      padding: 11px 18px;
-      border: 1px solid #4ade80;
-      background: #052e16;
-      color: #4ade80;
-      box-shadow: 2px 2px 0 #166534;
-    }
-
-    /* ── Animations ── */
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(16px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
-
-    @keyframes glowPulse {
-
-      0%,
-      100% {
-        box-shadow: 0 0 8px #4ade8066, inset -4px -4px 0 #166534, inset 4px 4px 0 #86efac
-      }
-
-      50% {
-        box-shadow: 0 0 28px #4ade80aa, inset -4px -4px 0 #166534, inset 4px 4px 0 #86efac
-      }
-    }
-
-    .fade-in {
-      animation: fadeIn .7s ease-out forwards;
-    }
-
-    /* ── Layout ── */
-    .container {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-
-    .window {
-      border: 2px solid #374151;
-      background: #10121a;
-      box-shadow: 4px 4px 0 #1f2937, 8px 8px 0 #0a0a0e;
-      margin-bottom: 20px;
-    }
-
-    .win-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 5px 10px;
-      background: #1e3a8a;
-    }
-
-    .win-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      color: #fff;
-      letter-spacing: 1px;
-    }
-
-    .win-dots {
-      display: flex;
-      gap: 5px;
-    }
-
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 0, 0, .3);
-    }
-
-    .scanlines {
-      position: relative;
-    }
-
-    .scanlines::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 0, 0, .07) 3px, rgba(0, 0, 0, .07) 4px);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* ── Hero ── */
-    .hero-inner {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 0 24px 52px;
-    }
-
-    .hero-left {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      width: 100%;
-    }
-
-    .hero-right {
-      border: 1px solid #374151;
-      padding: 18px;
-      width: 100%;
-      max-width: 480px;
-      background: #0e1018;
-      position: relative;
-      z-index: 3;
-      margin-top: 36px;
-      text-align: left;
-    }
-
-    .edu-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 8px;
-      color: #fff;
-      margin-bottom: 14px;
-      text-transform: uppercase;
-    }
-
-    .edu-line {
-      font-size: 12px;
-      color: #d1d5db;
-      margin-bottom: 10px;
-      line-height: 1.5;
-    }
-
-    .edu-line strong { color: #4ade80; }
-
-    .hero-banner {
-      width: 100%;
-      height: 160px;
-      background-color: #1a1c23;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      border-bottom: 1px solid #374151;
-    }
-
-    .pfp-wrapper {
-      position: relative;
-      margin-top: -85px; /* Overlap banner */
-      margin-bottom: 12px;
-      display: inline-block;
-    }
-
-    #profile-pic {
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      object-fit: cover;
-      /* Thick border matching background #10121a to simulate cutout */
-      border: 7px solid #10121a; 
-      background: #10121a;
-      display: none;
-    }
-
-    .status-badge {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #10121a; /* Cutout match */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .status-badge-inner {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 4px solid #6b7280; /* Offline/idle icon layout */
-      background: #111;
-    }
-
-    .start-btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: #fff;
-      background: #16a34a;
-      border: 3px solid #14532d;
-      padding: 13px 30px;
-      cursor: pointer;
-      animation: glowPulse 2.4s ease-in-out infinite;
-      margin-top: 8px;
-      transition: filter .1s;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .start-btn:hover {
-      filter: brightness(1.18);
-    }
-
-    .start-btn:active {
-      transform: translate(2px, 2px);
-      animation: none;
-    }
-
-    /* ── Skills ── */
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .tag {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      color: #d1d5db;
-      border: 1px solid #374151;
-      background: #181b26;
-      padding: 8px 15px;
-      border-radius: 9999px;
-      cursor: default;
-      transition: background .15s, color .15s, border-color .15s;
-    }
-
-    .tag:hover {
-      background: #4ade80;
-      color: #000;
-      border-color: #4ade80;
-    }
-
-    /* ── Projects ── */
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 14px;
-    }
-
-    .project-card {
-      border: 1px solid #374151;
-      background: #0e1018;
-      position: relative;
-      overflow: hidden;
-      transition: transform .18s, box-shadow .18s;
-    }
-
-    .project-card:hover {
-      transform: translate(-3px, -3px);
-      box-shadow: 6px 6px 0 #1f2937, 10px 10px 0 #0a0a0e;
-    }
-
-    .card-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 4px 8px;
-      background: #1e293b;
-    }
-
-    .card-title-sm {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: #9ca3af;
-    }
-
-    .card-dots {
-      display: flex;
-      gap: 3px;
-    }
-
-    .card-thumb {
-      height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #12151f;
-      border-bottom: 1px solid #1f2937;
-      font-size: 36px;
-    }
-
-    .card-body {
-      padding: 12px;
-    }
-
-    .card-desc {
-      font-size: 11px;
-      color: #6b7280;
-      line-height: 1.6;
-      margin-bottom: 10px;
-    }
-
-    .card-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-bottom: 10px;
-    }
-
-    .card-tag {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: #4ade80;
-      border: 1px solid #14532d;
-      background: #052e16;
-      padding: 2px 6px;
-    }
-
-    .view-btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: #9ca3af;
-      border: 1px solid #374151;
-      background: #181b26;
-      width: 100%;
-      padding: 6px 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: color .15s, border-color .15s;
-      text-decoration: none;
-    }
-
-    .view-btn:hover {
-      color: #4ade80;
-      border-color: #4ade80;
-    }
-
-    /* ── Warning Dialog ── */
-    .warn-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 20;
-      background: rgba(0, 0, 0, .65);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .warn-box {
-      border: 2px solid #6b7280;
-      background: #1a1d28;
-      width: 200px;
-      box-shadow: 3px 3px 0 #111827;
-    }
-
-    .warn-bar-top {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 8px;
-      background: #1e3a8a;
-    }
-
-    .warn-bar-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      color: #fff;
-    }
-
-    .warn-close-btn {
-      margin-left: auto;
-      width: 16px;
-      height: 16px;
-      border: 1px solid #9ca3af;
-      background: #374151;
-      color: #fff;
-      font-size: 10px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .warn-body {
-      padding: 14px 16px;
-      text-align: center;
-    }
-
-    .warn-msg {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 8px;
-      color: #fff;
-      line-height: 2;
-      margin-bottom: 14px;
-    }
-
-    .warn-btns {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .warn-btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      color: #fff;
-      border: 1px solid #6b7280;
-      background: #2d3142;
-      padding: 5px 16px;
-      cursor: pointer;
-      box-shadow: inset -2px -2px 0 #374151, inset 2px 2px 0 #9ca3af;
-    }
-
-    .warn-btn:hover {
-      filter: brightness(1.2);
-    }
-
-    /* ── Contact ── */
-    .section-head {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-    }
-
-    .section-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
-      color: #fff;
-    }
-
-    .contact-inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      padding: 28px 20px;
-    }
-
-    .contact-links {
-      display: flex;
-      gap: 36px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .contact-link {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-    }
-
-    .contact-icon-box {
-      padding: 12px;
-      border: 1px solid #374151;
-      background: #181b26;
-      transition: transform .2s;
-    }
-
-    .contact-link:hover .contact-icon-box {
-      transform: translateY(-5px);
-    }
-
-    .contact-lbl {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: #374151;
-    }
-
-    .ic-mail {
-      color: #f87171;
-      box-shadow: 0 0 12px #f8717133;
-    }
-
-    .ic-gh {
-      color: #a78bfa;
-      box-shadow: 0 0 12px #a78bfa33;
-    }
-
-    .ic-li {
-      color: #60a5fa;
-      box-shadow: 0 0 12px #60a5fa33;
-    }
-
-    svg.px {
-      image-rendering: pixelated;
-      shape-rendering: crispEdges;
-    }
-
-    /* ── Sakura Canvas ── */
-    #sakuraCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      pointer-events: none;
-      display: block;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio</title>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0c0c10;
+            color: #e2e8f0;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+        }
+
+        body.admin-active {
+            padding-top: 50px;
+        }
+
+        /* ── Admin Bar ── */
+        #admin-bar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: #080b14;
+            border-bottom: 2px solid #1e3a8a;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+        }
+
+        #admin-bar.on {
+            display: flex;
+        }
+
+        #admin-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid #4ade80;
+        }
+
+        #admin-email-lbl {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: #4ade80;
+        }
+
+        .abar-btn {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            border: 1px solid;
+            padding: 6px 10px;
+            cursor: pointer;
+            background: transparent;
+            transition: all .15s;
+        }
+
+        #edit-toggle {
+            color: #facc15;
+            border-color: #facc15;
+            margin-left: auto;
+        }
+
+        #edit-toggle.on {
+            background: #facc15;
+            color: #000;
+        }
+
+        #logout-btn {
+            color: #f87171;
+            border-color: #f87171;
+        }
+
+        #logout-btn:hover {
+            background: #f87171;
+            color: #000;
+        }
+
+        /* ── Admin Trigger Button ── */
+        #admin-trigger {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 900;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            background: #10121a;
+            border: 1px solid #374151;
+            color: #4b5563;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 2px 2px 0 #1f2937;
+        }
+
+        #admin-trigger:hover {
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        /* ── Login Modal ── */
+        #login-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(0, 0, 0, .88);
+            align-items: center;
+            justify-content: center;
+        }
+
+        #login-modal.on {
+            display: flex;
+        }
+
+        #login-box {
+            background: #10121a;
+            border: 2px solid #374151;
+            width: 330px;
+            box-shadow: 6px 6px 0 #1f2937, 10px 10px 0 #0a0a0e;
+            overflow: hidden;
+            animation: slideDown .25s ease-out;
+        }
+
+        .modal-bar {
+            background: #1e3a8a;
+            padding: 7px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-bar-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            color: #fff;
+        }
+
+        .modal-close {
+            background: #ef4444;
+            border: none;
+            color: #fff;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .login-body {
+            padding: 28px 24px;
+            text-align: center;
+        }
+
+        .login-body p {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 22px;
+            line-height: 1.7;
+        }
+
+        #google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: #fff;
+            color: #1f2937;
+            border: none;
+            padding: 12px 18px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            transition: filter .15s;
+        }
+
+        #google-btn:hover {
+            filter: brightness(.92);
+        }
+
+        #login-err {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            color: #f87171;
+            margin-top: 14px;
+            min-height: 16px;
+            line-height: 1.8;
+        }
+
+        /* ── Edit Modal ── */
+        #edit-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1500;
+            background: rgba(0, 0, 0, .82);
+            align-items: center;
+            justify-content: center;
+        }
+
+        #edit-modal.on {
+            display: flex;
+        }
+
+        #edit-box {
+            background: #10121a;
+            border: 2px solid #374151;
+            box-shadow: 6px 6px 0 #1f2937;
+            width: 92%;
+            max-width: 520px;
+            max-height: 88vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideDown .2s ease-out;
+        }
+
+        #edit-form-area {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            color: #9ca3af;
+            display: block;
+            margin-bottom: 7px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            background: #181b26;
+            border: 1px solid #374151;
+            color: #e2e8f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            padding: 9px 11px;
+            outline: none;
+            transition: border-color .15s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: #4ade80;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .form-hint {
+            font-size: 10px;
+            color: #4b5563;
+            margin-top: 5px;
+            line-height: 1.6;
+        }
+
+        .edit-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #1f2937;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-shrink: 0;
+        }
+
+        .btn-save {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            color: #fff;
+            background: #16a34a;
+            border: 2px solid #14532d;
+            padding: 9px 18px;
+            cursor: pointer;
+            box-shadow: inset -2px -2px 0 #166534, inset 2px 2px 0 #86efac;
+            transition: filter .1s;
+        }
+
+        .btn-save:hover {
+            filter: brightness(1.15);
+        }
+
+        .btn-cancel {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            background: transparent;
+            color: #9ca3af;
+            border: 1px solid #374151;
+            padding: 9px 14px;
+            cursor: pointer;
+        }
+
+        /* ── Edit Mode ── */
+        .editable-zone {
+            position: relative;
+        }
+
+        .edit-pencil {
+            display: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            background: #1e3a8a;
+            color: #fff;
+            border: 1px solid #3b82f6;
+            padding: 4px 9px;
+            cursor: pointer;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px;
+            transition: background .15s;
+        }
+
+        .edit-pencil:hover {
+            background: #2563eb;
+        }
+
+        body.edit-mode .edit-pencil {
+            display: inline-flex;
+        }
+
+        body.edit-mode .editable-zone {
+            outline: 1px dashed #1d4ed880;
+            outline-offset: 5px;
+        }
+
+        .proj-edit-row {
+            display: none;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        body.edit-mode .proj-edit-row {
+            display: flex;
+        }
+
+        .proj-btn {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            padding: 4px 9px;
+            border: 1px solid;
+            cursor: pointer;
+            background: transparent;
+            transition: all .12s;
+        }
+
+        .proj-btn.edit {
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+
+        .proj-btn.edit:hover {
+            background: #60a5fa;
+            color: #000;
+        }
+
+        .proj-btn.del {
+            color: #f87171;
+            border-color: #f87171;
+        }
+
+        .proj-btn.del:hover {
+            background: #f87171;
+            color: #000;
+        }
+
+        #add-proj-btn {
+            display: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            background: #052e16;
+            color: #4ade80;
+            border: 1px dashed #166534;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: background .15s;
+        }
+
+        #add-proj-btn:hover {
+            background: #064e3b;
+        }
+
+        body.edit-mode #add-proj-btn {
+            display: block;
+        }
+
+        /* ── Toast ── */
+        #save-toast {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 3000;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            padding: 11px 18px;
+            border: 1px solid #4ade80;
+            background: #052e16;
+            color: #4ade80;
+            box-shadow: 2px 2px 0 #166534;
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 8px #4ade8066, inset -4px -4px 0 #166534, inset 4px 4px 0 #86efac
+            }
+
+            50% {
+                box-shadow: 0 0 28px #4ade80aa, inset -4px -4px 0 #166534, inset 4px 4px 0 #86efac
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn .7s ease-out forwards;
+        }
+
+        /* ── Layout ── */
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .window {
+            border: 2px solid #374151;
+            background: #10121a;
+            box-shadow: 4px 4px 0 #1f2937, 8px 8px 0 #0a0a0e;
+            margin-bottom: 20px;
+        }
+
+        .win-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 10px;
+            background: #1e3a8a;
+        }
+
+        .win-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .win-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, .3);
+        }
+
+        .scanlines {
+            position: relative;
+        }
+
+        .scanlines::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 0, 0, .07) 3px, rgba(0, 0, 0, .07) 4px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ── Hero ── */
+        .hero-inner {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 24px 52px;
+        }
+
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        .hero-right {
+            border: 1px solid #374151;
+            padding: 18px;
+            width: 100%;
+            max-width: 480px;
+            background: #0e1018;
+            position: relative;
+            z-index: 3;
+            margin-top: 36px;
+            text-align: left;
+        }
+
+        .edu-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            color: #fff;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+
+        .edu-line {
+            font-size: 12px;
+            color: #d1d5db;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .edu-line strong {
+            color: #4ade80;
+        }
+
+        .hero-banner {
+            width: 100%;
+            height: 160px;
+            background-color: #1a1c23;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border-bottom: 1px solid #374151;
+        }
+
+        .pfp-wrapper {
+            position: relative;
+            margin-top: -85px;
+            /* Overlap banner */
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        #profile-pic {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            /* Thick border matching background #10121a to simulate cutout */
+            border: 7px solid #10121a;
+            background: #10121a;
+            display: none;
+        }
+
+        .status-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #10121a;
+            /* Cutout match */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-badge-inner {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 4px solid #6b7280;
+            /* Offline/idle icon layout */
+            background: #111;
+        }
+
+        .start-btn {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #fff;
+            background: #16a34a;
+            border: 3px solid #14532d;
+            padding: 13px 30px;
+            cursor: pointer;
+            animation: glowPulse 2.4s ease-in-out infinite;
+            margin-top: 8px;
+            transition: filter .1s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .start-btn:hover {
+            filter: brightness(1.18);
+        }
+
+        .start-btn:active {
+            transform: translate(2px, 2px);
+            animation: none;
+        }
+
+        /* ── Skills ── */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            color: #d1d5db;
+            border: 1px solid #374151;
+            background: #181b26;
+            padding: 8px 15px;
+            border-radius: 9999px;
+            cursor: default;
+            transition: background .15s, color .15s, border-color .15s;
+        }
+
+        .tag:hover {
+            background: #4ade80;
+            color: #000;
+            border-color: #4ade80;
+        }
+
+        /* ── Projects ── */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 14px;
+        }
+
+        .project-card {
+            border: 1px solid #374151;
+            background: #0e1018;
+            position: relative;
+            overflow: hidden;
+            transition: transform .18s, box-shadow .18s;
+        }
+
+        .project-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 6px 6px 0 #1f2937, 10px 10px 0 #0a0a0e;
+        }
+
+        .card-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 8px;
+            background: #1e293b;
+        }
+
+        .card-title-sm {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            color: #9ca3af;
+        }
+
+        .card-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .card-thumb {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #12151f;
+            border-bottom: 1px solid #1f2937;
+            font-size: 36px;
+        }
+
+        .card-body {
+            padding: 12px;
+        }
+
+        .card-desc {
+            font-size: 11px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .card-tag {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            color: #4ade80;
+            border: 1px solid #14532d;
+            background: #052e16;
+            padding: 2px 6px;
+        }
+
+        .view-btn {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            color: #9ca3af;
+            border: 1px solid #374151;
+            background: #181b26;
+            width: 100%;
+            padding: 6px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: color .15s, border-color .15s;
+            text-decoration: none;
+        }
+
+        .view-btn:hover {
+            color: #4ade80;
+            border-color: #4ade80;
+        }
+
+        /* ── Warning Dialog ── */
+        .warn-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            background: rgba(0, 0, 0, .65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .warn-box {
+            border: 2px solid #6b7280;
+            background: #1a1d28;
+            width: 200px;
+            box-shadow: 3px 3px 0 #111827;
+        }
+
+        .warn-bar-top {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 8px;
+            background: #1e3a8a;
+        }
+
+        .warn-bar-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            color: #fff;
+        }
+
+        .warn-close-btn {
+            margin-left: auto;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #9ca3af;
+            background: #374151;
+            color: #fff;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .warn-body {
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .warn-msg {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            color: #fff;
+            line-height: 2;
+            margin-bottom: 14px;
+        }
+
+        .warn-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .warn-btn {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            color: #fff;
+            border: 1px solid #6b7280;
+            background: #2d3142;
+            padding: 5px 16px;
+            cursor: pointer;
+            box-shadow: inset -2px -2px 0 #374151, inset 2px 2px 0 #9ca3af;
+        }
+
+        .warn-btn:hover {
+            filter: brightness(1.2);
+        }
+
+        /* ── Contact ── */
+        .section-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            color: #fff;
+        }
+
+        .contact-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 28px 20px;
+        }
+
+        .contact-links {
+            display: flex;
+            gap: 36px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .contact-icon-box {
+            padding: 12px;
+            border: 1px solid #374151;
+            background: #181b26;
+            transition: transform .2s;
+        }
+
+        .contact-link:hover .contact-icon-box {
+            transform: translateY(-5px);
+        }
+
+        .contact-lbl {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            color: #374151;
+        }
+
+        .ic-mail {
+            color: #f87171;
+            box-shadow: 0 0 12px #f8717133;
+        }
+
+        .ic-gh {
+            color: #a78bfa;
+            box-shadow: 0 0 12px #a78bfa33;
+        }
+
+        .ic-li {
+            color: #60a5fa;
+            box-shadow: 0 0 12px #60a5fa33;
+        }
+
+        svg.px {
+            image-rendering: pixelated;
+            shape-rendering: crispEdges;
+        }
+
+        /* ── Sakura Canvas ── */
+        #sakuraCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
 
-  <!-- ── Sakura Canvas ── -->
-  <canvas id="sakuraCanvas"></canvas>
+    <!-- ── Sakura Canvas ── -->
+    <canvas id="sakuraCanvas"></canvas>
 
-  <!-- ── Admin Bar ── -->
-  <div id="admin-bar">
-    <img id="admin-avatar" src="" alt="" />
-    <span id="admin-email-lbl"></span>
-    <button class="abar-btn" id="edit-toggle" onclick="toggleEdit()">✏ EDIT MODE: OFF</button>
-    <button class="abar-btn" id="logout-btn" onclick="doLogout()">⏻ LOGOUT</button>
-  </div>
-
-  <!-- ── Admin Trigger ── -->
-  <button id="admin-trigger" onclick="openLoginModal()">🔐 ADMIN</button>
-
-  <!-- ── Login Modal ── -->
-  <div id="login-modal">
-    <div id="login-box">
-      <div class="modal-bar">
-        <span class="modal-bar-title">🔐 ADMIN ACCESS</span>
-        <button class="modal-close" onclick="closeLoginModal()">×</button>
-      </div>
-      <div class="login-body">
-        <p>Sign in with your admin Google account.<br />Only the authorised admin email can access edit mode.</p>
-        <button id="google-btn" onclick="googleSignIn()">
-          <svg width="18" height="18" viewBox="0 0 48 48">
-            <path fill="#EA4335"
-              d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
-            <path fill="#4285F4"
-              d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
-            <path fill="#FBBC05"
-              d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
-            <path fill="#34A853"
-              d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
-          </svg>
-          SIGN IN WITH GOOGLE
-        </button>
-        <p id="login-err"></p>
-      </div>
+    <!-- ── Admin Bar ── -->
+    <div id="admin-bar">
+        <img id="admin-avatar" src="" alt="" />
+        <span id="admin-email-lbl"></span>
+        <button class="abar-btn" id="edit-toggle" onclick="toggleEdit()">✏ EDIT MODE: OFF</button>
+        <button class="abar-btn" id="logout-btn" onclick="doLogout()">⏻ LOGOUT</button>
     </div>
-  </div>
 
-  <!-- ── Edit Modal ── -->
-  <div id="edit-modal">
-    <div id="edit-box">
-      <div class="modal-bar">
-        <span class="modal-bar-title" id="edit-modal-ttl">EDIT</span>
-        <button class="modal-close" onclick="closeEditModal()">×</button>
-      </div>
-      <div id="edit-form-area"></div>
-      <div class="edit-footer">
-        <button class="btn-cancel" onclick="closeEditModal()">CANCEL</button>
-        <button class="btn-save" id="do-save">💾 SAVE CHANGES</button>
-      </div>
-    </div>
-  </div>
+    <!-- ── Admin Trigger ── -->
+    <button id="admin-trigger" onclick="openLoginModal()">🔐 ADMIN</button>
 
-  <!-- ── Toast ── -->
-  <div id="save-toast">✓ SAVED</div>
-
-  <!-- ══════════ PORTFOLIO ══════════ -->
-  <div style="padding-top:20px" class="fade-in">
-    <div class="container">
-
-      <!-- HERO -->
-      <section style="padding:8px 0 28px">
-        <div class="window scanlines">
-          <div class="win-bar">
-            <span class="win-title">PORTFOLIO.EXE</span>
-            <div class="win-dots">
-              <div class="dot" style="background:#eab308"></div>
-              <div class="dot" style="background:#22c55e"></div>
-              <div class="dot" style="background:#ef4444"></div>
+    <!-- ── Login Modal ── -->
+    <div id="login-modal">
+        <div id="login-box">
+            <div class="modal-bar">
+                <span class="modal-bar-title">🔐 ADMIN ACCESS</span>
+                <button class="modal-close" onclick="closeLoginModal()">×</button>
             </div>
-            </div>
-          </div>
-          <!-- Banner Image Area -->
-          <div class="hero-banner" id="d-banner"></div>
-          <div class="hero-inner">
-            <div class="hero-left">
-              <div class="pfp-wrapper">
-                <img id="profile-pic" src="" alt="Profile Photo" />
-                <div class="status-badge"><div class="status-badge-inner"></div></div>
-              </div>
-              <p style="font-family:'Press Start 2P',monospace;font-size:8px;color:#374151;position:relative;z-index:3">
-                &gt;&gt;&gt; SYSTEM READY</p>
-              <div class="editable-zone" style="position:relative;z-index:3;width:100%">
-                <button class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
-                <h1
-                  style="font-family:'Press Start 2P',monospace;font-size:clamp(14px,3vw,22px);line-height:1.9;color:#fff">
-                  HI, I'M<br />
-                  <span id="d-name" style="color:#4ade80;text-shadow:0 0 24px #4ade8055">YOUR NAME</span>
-                </h1>
-                <p id="d-role" style="font-size:15px;color:#6b7280;margin-top:10px">Student Developer · UI/UX Enthusiast
+            <div class="login-body">
+                <p>Sign in with your admin Google account.<br />Only the authorised admin email can access edit mode.
                 </p>
-                <p id="d-sub" style="font-size:12px;color:#374151;margin-top:6px">Building cool things — one commit at a
-                  time</p>
-                <a id="d-resume" href="#" class="start-btn" style="margin-top:16px">&#9660; DOWNLOAD RESUME</a>
-              </div>
-              <p
-                style="font-family:'Press Start 2P',monospace;font-size:6px;color:#1f2937;margin-top:10px;position:relative;z-index:3">
-                © 2025 PORTFOLIO — ALL RIGHTS RESERVED</p>
+                <button id="google-btn" onclick="googleSignIn()">
+                    <svg width="18" height="18" viewBox="0 0 48 48">
+                        <path fill="#EA4335"
+                            d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                        <path fill="#4285F4"
+                            d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                        <path fill="#FBBC05"
+                            d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                        <path fill="#34A853"
+                            d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                    </svg>
+                    SIGN IN WITH GOOGLE
+                </button>
+                <p id="login-err"></p>
             </div>
-            
-            <div class="hero-right editable-zone">
-              <button class="edit-pencil" onclick="openEduEdit()" style="position:absolute;top:-15px;right:0;">✏ EDIT EDU</button>
-              <div class="edu-title">COLLEGE_DETAILS</div>
-              <div class="edu-line"><strong>COLLEGE:</strong> <span id="d-college">IIT Madras</span></div>
-              <div class="edu-line"><strong>CGPA:</strong> <span id="d-cgpa">7.2</span></div>
-              <div class="edu-line"><strong>DEGREES:</strong> <span id="d-degrees">BTech</span></div>
-            </div>
-          </div>
         </div>
-      </section>
+    </div>
 
-      <!-- SKILLS -->
-      <section>
-        <div class="window">
-          <div class="win-bar" style="background:#1e293b">
-            <span class="win-title">SKILLS.DAT</span>
-            <div class="win-dots">
-              <div class="dot" style="background:#eab308"></div>
-              <div class="dot" style="background:#22c55e"></div>
-              <div class="dot" style="background:#ef4444"></div>
+    <!-- ── Edit Modal ── -->
+    <div id="edit-modal">
+        <div id="edit-box">
+            <div class="modal-bar">
+                <span class="modal-bar-title" id="edit-modal-ttl">EDIT</span>
+                <button class="modal-close" onclick="closeEditModal()">×</button>
             </div>
-          </div>
-          <div style="padding:20px 22px">
-            <div class="section-head">
-              <svg class="px" width="18" height="14" viewBox="0 0 18 14" fill="#4ade80">
-                <rect x="0" y="4" width="18" height="6" />
-                <rect x="1" y="2" width="16" height="10" />
-                <rect x="2" y="1" width="5" height="12" />
-                <rect x="11" y="1" width="5" height="12" />
-              </svg>
-              <span class="section-title">TECH_STACK</span>
-              <div class="editable-zone" style="margin-left:auto">
-                <button class="edit-pencil" onclick="openSkillsEdit()">✏ EDIT SKILLS</button>
-              </div>
+            <div id="edit-form-area"></div>
+            <div class="edit-footer">
+                <button class="btn-cancel" onclick="closeEditModal()">CANCEL</button>
+                <button class="btn-save" id="do-save">💾 SAVE CHANGES</button>
             </div>
-            <div class="tags" id="d-skills"></div>
-          </div>
         </div>
-      </section>
+    </div>
 
-      <!-- PROJECTS -->
-      <section>
-        <div class="window">
-          <div class="win-bar" style="background:#1e293b">
-            <span class="win-title">PROJECTS.DIR</span>
-            <div class="win-dots">
-              <div class="dot" style="background:#eab308"></div>
-              <div class="dot" style="background:#22c55e"></div>
-              <div class="dot" style="background:#ef4444"></div>
-            </div>
-          </div>
-          <div style="padding:20px 22px">
-            <div class="section-head">
-              <svg class="px" width="20" height="16" viewBox="0 0 20 16" fill="#facc15">
-                <rect x="0" y="4" width="20" height="12" />
-                <rect x="0" y="2" width="8" height="4" />
-                <rect x="1" y="1" width="6" height="2" />
-              </svg>
-              <span class="section-title">MY_PROJECTS</span>
-            </div>
-            <div class="projects-grid" id="d-projects"></div>
-            <button id="add-proj-btn" onclick="openAddProject()">＋ ADD NEW PROJECT</button>
-          </div>
-        </div>
-      </section>
+    <!-- ── Toast ── -->
+    <div id="save-toast">✓ SAVED</div>
 
-      <!-- CONTACT -->
-      <section>
-        <div class="window" style="margin-bottom:70px">
-          <div class="win-bar" style="background:#1e293b">
-            <span class="win-title">CONTACT.EXE</span>
-            <div class="win-dots">
-              <div class="dot" style="background:#eab308"></div>
-              <div class="dot" style="background:#22c55e"></div>
-              <div class="dot" style="background:#ef4444"></div>
-            </div>
-          </div>
-          <div class="contact-inner">
-            <div class="section-head" style="margin-bottom:0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
-                stroke="#60a5fa" stroke-width="2" stroke-linecap="square">
-                <polyline points="16 18 22 12 16 6" />
-                <polyline points="8 6 2 12 8 18" />
-              </svg>
-              <span class="section-title">GET_IN_TOUCH</span>
-              <div class="editable-zone" style="margin-left:auto">
-                <button class="edit-pencil" onclick="openContactEdit()">✏ EDIT LINKS</button>
-              </div>
-            </div>
-            <p style="font-size:13px;color:#4b5563;text-align:center">Open to internships, collabs, and cool side
-              projects.</p>
-            <div class="contact-links">
-              <a id="d-email" href="#" class="contact-link">
-                <div class="contact-icon-box ic-mail">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="square">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                    <polyline points="22,6 12,13 2,6" />
-                  </svg>
+    <!-- ══════════ PORTFOLIO ══════════ -->
+    <div style="padding-top:20px" class="fade-in">
+        <div class="container">
+
+            <!-- HERO -->
+            <section style="padding:8px 0 28px">
+                <div class="window scanlines">
+                    <div class="win-bar">
+                        <span class="win-title">PORTFOLIO.EXE</span>
+                        <div class="win-dots">
+                            <div class="dot" style="background:#eab308"></div>
+                            <div class="dot" style="background:#22c55e"></div>
+                            <div class="dot" style="background:#ef4444"></div>
+                        </div>
+                    </div>
                 </div>
-                <span class="contact-lbl">EMAIL</span>
-              </a>
-              <a id="d-github" href="#" target="_blank" class="contact-link">
-                <div class="contact-icon-box ic-gh">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="square">
-                    <path
-                      d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-                  </svg>
+                <!-- Banner Image Area -->
+                <div class="hero-banner" id="d-banner"></div>
+                <div class="hero-inner">
+                    <div class="hero-left">
+                        <div class="pfp-wrapper">
+                            <img id="profile-pic" src="" alt="Profile Photo" />
+                            <div class="status-badge">
+                                <div class="status-badge-inner"></div>
+                            </div>
+                        </div>
+                        <p
+                            style="font-family:'Press Start 2P',monospace;font-size:8px;color:#374151;position:relative;z-index:3">
+                            &gt;&gt;&gt; SYSTEM READY</p>
+                        <div class="editable-zone" style="position:relative;z-index:3;width:100%">
+                            <button class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
+                            <h1
+                                style="font-family:'Press Start 2P',monospace;font-size:clamp(14px,3vw,22px);line-height:1.9;color:#fff">
+                                HI, I'M<br />
+                                <span id="d-name" style="color:#4ade80;text-shadow:0 0 24px #4ade8055">YOUR NAME</span>
+                            </h1>
+                            <p id="d-role" style="font-size:15px;color:#6b7280;margin-top:10px">Student Developer ·
+                                UI/UX Enthusiast
+                            </p>
+                            <p id="d-sub" style="font-size:12px;color:#374151;margin-top:6px">Building cool things — one
+                                commit at a
+                                time</p>
+                            <a id="d-resume" href="#" class="start-btn" style="margin-top:16px">&#9660; DOWNLOAD
+                                RESUME</a>
+                        </div>
+                        <p
+                            style="font-family:'Press Start 2P',monospace;font-size:6px;color:#1f2937;margin-top:10px;position:relative;z-index:3">
+                            © 2025 PORTFOLIO — ALL RIGHTS RESERVED</p>
+                    </div>
+
+                    <div class="hero-right editable-zone">
+                        <button class="edit-pencil" onclick="openEduEdit()"
+                            style="position:absolute;top:-15px;right:0;">✏ EDIT EDU</button>
+                        <div class="edu-title">COLLEGE_DETAILS</div>
+                        <div class="edu-line"><strong>COLLEGE:</strong> <span id="d-college">IIT Madras</span></div>
+                        <div class="edu-line"><strong>CGPA:</strong> <span id="d-cgpa">7.2</span></div>
+                        <div class="edu-line"><strong>DEGREES:</strong> <span id="d-degrees">BTech</span></div>
+                    </div>
                 </div>
-                <span class="contact-lbl">GITHUB</span>
-              </a>
-              <a id="d-linkedin" href="#" target="_blank" class="contact-link">
-                <div class="contact-icon-box ic-li">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="square">
-                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                    <rect x="2" y="9" width="4" height="12" />
-                    <circle cx="4" cy="4" r="2" />
-                  </svg>
-                </div>
-                <span class="contact-lbl">LINKEDIN</span>
-              </a>
-            </div>
-            <p
-              style="font-family:'Press Start 2P',monospace;font-size:6px;color:#1f2937;text-align:center;line-height:2.4">
-              &gt; PORTFOLIO.EXE — HTML + CSS + JS + FIREBASE<br />&gt; v2.0.0 — 2025
-            </p>
-          </div>
         </div>
-      </section>
+        </section>
+
+        <!-- SKILLS -->
+        <section>
+            <div class="window">
+                <div class="win-bar" style="background:#1e293b">
+                    <span class="win-title">SKILLS.DAT</span>
+                    <div class="win-dots">
+                        <div class="dot" style="background:#eab308"></div>
+                        <div class="dot" style="background:#22c55e"></div>
+                        <div class="dot" style="background:#ef4444"></div>
+                    </div>
+                </div>
+                <div style="padding:20px 22px">
+                    <div class="section-head">
+                        <svg class="px" width="18" height="14" viewBox="0 0 18 14" fill="#4ade80">
+                            <rect x="0" y="4" width="18" height="6" />
+                            <rect x="1" y="2" width="16" height="10" />
+                            <rect x="2" y="1" width="5" height="12" />
+                            <rect x="11" y="1" width="5" height="12" />
+                        </svg>
+                        <span class="section-title">TECH_STACK</span>
+                        <div class="editable-zone" style="margin-left:auto">
+                            <button class="edit-pencil" onclick="openSkillsEdit()">✏ EDIT SKILLS</button>
+                        </div>
+                    </div>
+                    <div class="tags" id="d-skills"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROJECTS -->
+        <section>
+            <div class="window">
+                <div class="win-bar" style="background:#1e293b">
+                    <span class="win-title">PROJECTS.DIR</span>
+                    <div class="win-dots">
+                        <div class="dot" style="background:#eab308"></div>
+                        <div class="dot" style="background:#22c55e"></div>
+                        <div class="dot" style="background:#ef4444"></div>
+                    </div>
+                </div>
+                <div style="padding:20px 22px">
+                    <div class="section-head">
+                        <svg class="px" width="20" height="16" viewBox="0 0 20 16" fill="#facc15">
+                            <rect x="0" y="4" width="20" height="12" />
+                            <rect x="0" y="2" width="8" height="4" />
+                            <rect x="1" y="1" width="6" height="2" />
+                        </svg>
+                        <span class="section-title">MY_PROJECTS</span>
+                    </div>
+                    <div class="projects-grid" id="d-projects"></div>
+                    <button id="add-proj-btn" onclick="openAddProject()">＋ ADD NEW PROJECT</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section>
+            <div class="window" style="margin-bottom:70px">
+                <div class="win-bar" style="background:#1e293b">
+                    <span class="win-title">CONTACT.EXE</span>
+                    <div class="win-dots">
+                        <div class="dot" style="background:#eab308"></div>
+                        <div class="dot" style="background:#22c55e"></div>
+                        <div class="dot" style="background:#ef4444"></div>
+                    </div>
+                </div>
+                <div class="contact-inner">
+                    <div class="section-head" style="margin-bottom:0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                            stroke="#60a5fa" stroke-width="2" stroke-linecap="square">
+                            <polyline points="16 18 22 12 16 6" />
+                            <polyline points="8 6 2 12 8 18" />
+                        </svg>
+                        <span class="section-title">GET_IN_TOUCH</span>
+                        <div class="editable-zone" style="margin-left:auto">
+                            <button class="edit-pencil" onclick="openContactEdit()">✏ EDIT LINKS</button>
+                        </div>
+                    </div>
+                    <p style="font-size:13px;color:#4b5563;text-align:center">Open to internships, collabs, and cool
+                        side
+                        projects.</p>
+                    <div class="contact-links">
+                        <a id="d-email" href="#" class="contact-link">
+                            <div class="contact-icon-box ic-mail">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+                                    <path
+                                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                    <polyline points="22,6 12,13 2,6" />
+                                </svg>
+                            </div>
+                            <span class="contact-lbl">EMAIL</span>
+                        </a>
+                        <a id="d-github" href="#" target="_blank" class="contact-link">
+                            <div class="contact-icon-box ic-gh">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+                                    <path
+                                        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                                </svg>
+                            </div>
+                            <span class="contact-lbl">GITHUB</span>
+                        </a>
+                        <a id="d-linkedin" href="#" target="_blank" class="contact-link">
+                            <div class="contact-icon-box ic-li">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+                                    <path
+                                        d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                                    <rect x="2" y="9" width="4" height="12" />
+                                    <circle cx="4" cy="4" r="2" />
+                                </svg>
+                            </div>
+                            <span class="contact-lbl">LINKEDIN</span>
+                        </a>
+                    </div>
+                    <p
+                        style="font-family:'Press Start 2P',monospace;font-size:6px;color:#1f2937;text-align:center;line-height:2.4">
+                        &gt; PORTFOLIO.EXE — HTML + CSS + JS + FIREBASE<br />&gt; v2.0.0 — 2025
+                    </p>
+                </div>
+            </div>
+        </section>
 
     </div><!-- /container -->
-  </div>
+    </div>
 
-  <!-- ══════════ SCRIPT ══════════ -->
-  <script>
-    const ADMIN_EMAIL = 'aditya7karale@gmail.com';
+    <!-- ══════════ SCRIPT ══════════ -->
+    <script>
+        const ADMIN_EMAIL = 'aditya7karale@gmail.com';
 
-    firebase.initializeApp({
-      apiKey: "AIzaSyDm4Hx8Lu2gihDKbTMilUu4oB2Ih1ZId2g",
-      authDomain: "ariarohiatre.firebaseapp.com",
-      databaseURL: "https://ariarohiatre-default-rtdb.firebaseio.com",
-      projectId: "ariarohiatre",
-      storageBucket: "ariarohiatre.firebasestorage.app",
-      messagingSenderId: "881880075109",
-      appId: "1:881880075109:web:ec779dbb804c8b01616f8c"
-    });
-    const auth = firebase.auth();
-    const db = firebase.database();
+        firebase.initializeApp({
+            apiKey: "AIzaSyDm4Hx8Lu2gihDKbTMilUu4oB2Ih1ZId2g",
+            authDomain: "ariarohiatre.firebaseapp.com",
+            databaseURL: "https://ariarohiatre-default-rtdb.firebaseio.com",
+            projectId: "ariarohiatre",
+            storageBucket: "ariarohiatre.firebasestorage.app",
+            messagingSenderId: "881880075109",
+            appId: "1:881880075109:web:ec779dbb804c8b01616f8c"
+        });
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-    // Default data
-    const DEFAULTS = {
-      hero: { name: "YOUR NAME", role: "Student Developer · UI/UX Enthusiast", sub: "Building cool things — one commit at a time", resumeUrl: "#", profilePic: "", bannerUrl: "" },
-      edu: { college: "Your College", cgpa: "9.0", degrees: "Your Degree" },
-      skills: ["React", "TypeScript", "JavaScript", "Python", "Tailwind CSS", "Node.js", "GitHub", "HTML/CSS", "SQL", "Figma"],
-      projects: [
-        { title: "PORTFOLIO.EXE", emoji: "🌐", desc: "Personal portfolio with pixel-art aesthetic and animations.", tags: ["React", "Tailwind", "JS"], link: "#", showWarning: false },
-        { title: "WEATHER_APP.EXE", emoji: "⛅", desc: "Real-time weather dashboard powered by OpenWeather API.", tags: ["Python", "API", "CSS"], link: "#", showWarning: true },
-        { title: "TASKMASTER.EXE", emoji: "✅", desc: "Full-stack task manager with JWT auth and drag-and-drop boards.", tags: ["Node.js", "SQL", "React"], link: "#", showWarning: false }
-      ],
-      contact: { email: "mailto:aditya7karale@gmail.com", github: "#", linkedin: "#" }
-    };
-
-    let DATA = JSON.parse(JSON.stringify(DEFAULTS));
-    let isAdmin = false;
-    let editOn = false;
-
-    // Load from Firebase
-    db.ref('portfolio').once('value').then(snap => {
-      if (snap.exists()) {
-        const d = snap.val();
-        DATA = {
-          hero: d.hero || DEFAULTS.hero,
-          edu: d.edu || DEFAULTS.edu,
-          skills: d.skills || DEFAULTS.skills,
-          projects: d.projects || DEFAULTS.projects,
-          contact: d.contact || DEFAULTS.contact
+        // Default data
+        const DEFAULTS = {
+            hero: { name: "YOUR NAME", role: "Student Developer · UI/UX Enthusiast", sub: "Building cool things — one commit at a time", resumeUrl: "#", profilePic: "", bannerUrl: "" },
+            edu: { college: "Your College", cgpa: "9.0", degrees: "Your Degree" },
+            skills: ["React", "TypeScript", "JavaScript", "Python", "Tailwind CSS", "Node.js", "GitHub", "HTML/CSS", "SQL", "Figma"],
+            projects: [
+                { title: "PORTFOLIO.EXE", emoji: "🌐", desc: "Personal portfolio with pixel-art aesthetic and animations.", tags: ["React", "Tailwind", "JS"], link: "#", showWarning: false },
+                { title: "WEATHER_APP.EXE", emoji: "⛅", desc: "Real-time weather dashboard powered by OpenWeather API.", tags: ["Python", "API", "CSS"], link: "#", showWarning: true },
+                { title: "TASKMASTER.EXE", emoji: "✅", desc: "Full-stack task manager with JWT auth and drag-and-drop boards.", tags: ["Node.js", "SQL", "React"], link: "#", showWarning: false }
+            ],
+            contact: { email: "mailto:aditya7karale@gmail.com", github: "#", linkedin: "#" }
         };
-      }
-      renderAll();
-    });
 
-    // ── Render ──────────────────────────────────────────────────────────────────
-    function renderAll() { renderHero(); renderEdu(); renderSkills(); renderProjects(); renderContact(); }
+        let DATA = JSON.parse(JSON.stringify(DEFAULTS));
+        let isAdmin = false;
+        let editOn = false;
 
-    function renderEdu() {
-      const e = DATA.edu || DEFAULTS.edu;
-      document.getElementById('d-college').textContent = e.college || '';
-      document.getElementById('d-cgpa').textContent = e.cgpa || '';
-      document.getElementById('d-degrees').textContent = e.degrees || '';
-    }
+        // Load from Firebase
+        db.ref('portfolio').once('value').then(snap => {
+            if (snap.exists()) {
+                const d = snap.val();
+                DATA = {
+                    hero: d.hero || DEFAULTS.hero,
+                    edu: d.edu || DEFAULTS.edu,
+                    skills: d.skills || DEFAULTS.skills,
+                    projects: d.projects || DEFAULTS.projects,
+                    contact: d.contact || DEFAULTS.contact
+                };
+            }
+            renderAll();
+        });
 
-    function renderHero() {
-      const h = DATA.hero;
-      document.getElementById('d-name').textContent = h.name || '';
-      document.getElementById('d-role').textContent = h.role || '';
-      document.getElementById('d-sub').textContent = h.sub || '';
-      document.getElementById('d-resume').href = h.resumeUrl || '#';
-      
-      const banner = document.getElementById('d-banner');
-      if (h.bannerUrl) {
-         banner.style.backgroundImage = `url('${h.bannerUrl}')`;
-      } else {
-         banner.style.backgroundImage = 'none';
-      }
+        // ── Render ──────────────────────────────────────────────────────────────────
+        function renderAll() { renderHero(); renderEdu(); renderSkills(); renderProjects(); renderContact(); }
 
-      const pic = document.getElementById('profile-pic');
-      const fallbackPic = "https://api.dicebear.com/7.x/pixel-art/svg?seed=Captain&backgroundColor=10121a";
+        function renderEdu() {
+            const e = DATA.edu || DEFAULTS.edu;
+            document.getElementById('d-college').textContent = e.college || '';
+            document.getElementById('d-cgpa').textContent = e.cgpa || '';
+            document.getElementById('d-degrees').textContent = e.degrees || '';
+        }
 
-      if (h.profilePic) {
-        pic.src = h.profilePic;
-        pic.style.display = 'block';
-        pic.onerror = function () {
-          if (this.src !== fallbackPic) {
-            this.src = fallbackPic;
-          }
-        };
-      } else {
-        pic.src = fallbackPic;
-        pic.style.display = 'block';
-      }
-    }
+        function renderHero() {
+            const h = DATA.hero;
+            document.getElementById('d-name').textContent = h.name || '';
+            document.getElementById('d-role').textContent = h.role || '';
+            document.getElementById('d-sub').textContent = h.sub || '';
+            document.getElementById('d-resume').href = h.resumeUrl || '#';
 
-    function renderSkills() {
-      document.getElementById('d-skills').innerHTML =
-        (DATA.skills || []).map(s => `<span class="tag">${esc(s)}</span>`).join('');
-    }
+            const banner = document.getElementById('d-banner');
+            if (h.bannerUrl) {
+                banner.style.backgroundImage = `url('${h.bannerUrl}')`;
+            } else {
+                banner.style.backgroundImage = 'none';
+            }
 
-    function renderProjects() {
-      document.getElementById('d-projects').innerHTML =
-        (DATA.projects || []).map((p, i) => `
+            const pic = document.getElementById('profile-pic');
+            const fallbackPic = "https://api.dicebear.com/7.x/pixel-art/svg?seed=Captain&backgroundColor=10121a";
+
+            if (h.profilePic) {
+                pic.src = h.profilePic;
+                pic.style.display = 'block';
+                pic.onerror = function () {
+                    if (this.src !== fallbackPic) {
+                        this.src = fallbackPic;
+                    }
+                };
+            } else {
+                pic.src = fallbackPic;
+                pic.style.display = 'block';
+            }
+        }
+
+        function renderSkills() {
+            document.getElementById('d-skills').innerHTML =
+                (DATA.skills || []).map(s => `<span class="tag">${esc(s)}</span>`).join('');
+        }
+
+        function renderProjects() {
+            document.getElementById('d-projects').innerHTML =
+                (DATA.projects || []).map((p, i) => `
       <div class="project-card">
         <div class="card-bar">
           <span class="card-title-sm">${esc(p.title)}</span>
@@ -1315,72 +1331,72 @@
         </div>` : ''}
       </div>
     `).join('');
-    }
-
-    function renderContact() {
-      const c = DATA.contact;
-      document.getElementById('d-email').href = c.email || '#';
-      document.getElementById('d-github').href = c.github || '#';
-      document.getElementById('d-linkedin').href = c.linkedin || '#';
-    }
-
-    // ── Auth ─────────────────────────────────────────────────────────────────────
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        if (user.email === ADMIN_EMAIL) {
-          isAdmin = true;
-          document.getElementById('admin-bar').classList.add('on');
-          document.body.classList.add('admin-active');
-          document.getElementById('admin-avatar').src = user.photoURL || '';
-          document.getElementById('admin-email-lbl').textContent = '✓ ' + user.email;
-          document.getElementById('admin-trigger').style.display = 'none';
-          closeLoginModal();
-        } else {
-          auth.signOut();
-          setLoginErr('⛔ ACCESS DENIED. Only the admin account is allowed.');
         }
-      } else {
-        isAdmin = false; editOn = false;
-        document.body.classList.remove('edit-mode', 'admin-active');
-        document.getElementById('admin-bar').classList.remove('on');
-        document.getElementById('admin-trigger').style.display = 'block';
-        const et = document.getElementById('edit-toggle');
-        et.textContent = '✏ EDIT MODE: OFF'; et.classList.remove('on');
-      }
-    });
 
-    function googleSignIn() {
-      setLoginErr('');
-      const provider = new firebase.auth.GoogleAuthProvider();
-      provider.setCustomParameters({ login_hint: ADMIN_EMAIL });
-      auth.signInWithPopup(provider).catch(e => setLoginErr('Error: ' + e.message));
-    }
-    function doLogout() { auth.signOut(); }
+        function renderContact() {
+            const c = DATA.contact;
+            document.getElementById('d-email').href = c.email || '#';
+            document.getElementById('d-github').href = c.github || '#';
+            document.getElementById('d-linkedin').href = c.linkedin || '#';
+        }
 
-    // ── Edit mode ────────────────────────────────────────────────────────────────
-    function toggleEdit() {
-      if (!isAdmin) return;
-      editOn = !editOn;
-      document.body.classList.toggle('edit-mode', editOn);
-      const btn = document.getElementById('edit-toggle');
-      btn.textContent = editOn ? '✏ EDIT MODE: ON' : '✏ EDIT MODE: OFF';
-      btn.classList.toggle('on', editOn);
-    }
+        // ── Auth ─────────────────────────────────────────────────────────────────────
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                if (user.email === ADMIN_EMAIL) {
+                    isAdmin = true;
+                    document.getElementById('admin-bar').classList.add('on');
+                    document.body.classList.add('admin-active');
+                    document.getElementById('admin-avatar').src = user.photoURL || '';
+                    document.getElementById('admin-email-lbl').textContent = '✓ ' + user.email;
+                    document.getElementById('admin-trigger').style.display = 'none';
+                    closeLoginModal();
+                } else {
+                    auth.signOut();
+                    setLoginErr('⛔ ACCESS DENIED. Only the admin account is allowed.');
+                }
+            } else {
+                isAdmin = false; editOn = false;
+                document.body.classList.remove('edit-mode', 'admin-active');
+                document.getElementById('admin-bar').classList.remove('on');
+                document.getElementById('admin-trigger').style.display = 'block';
+                const et = document.getElementById('edit-toggle');
+                et.textContent = '✏ EDIT MODE: OFF'; et.classList.remove('on');
+            }
+        });
 
-    // ── Edit modal ───────────────────────────────────────────────────────────────
-    function openModal(title, html, onSave) {
-      document.getElementById('edit-modal-ttl').textContent = title;
-      document.getElementById('edit-form-area').innerHTML = html;
-      document.getElementById('do-save').onclick = onSave;
-      document.getElementById('edit-modal').classList.add('on');
-    }
-    function closeEditModal() { document.getElementById('edit-modal').classList.remove('on'); }
+        function googleSignIn() {
+            setLoginErr('');
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({ login_hint: ADMIN_EMAIL });
+            auth.signInWithPopup(provider).catch(e => setLoginErr('Error: ' + e.message));
+        }
+        function doLogout() { auth.signOut(); }
 
-    // ── Edit: Hero ───────────────────────────────────────────────────────────────
-    function openHeroEdit() {
-      if (!isAdmin) return;
-      const h = DATA.hero;
-      openModal('EDIT HERO', `
+        // ── Edit mode ────────────────────────────────────────────────────────────────
+        function toggleEdit() {
+            if (!isAdmin) return;
+            editOn = !editOn;
+            document.body.classList.toggle('edit-mode', editOn);
+            const btn = document.getElementById('edit-toggle');
+            btn.textContent = editOn ? '✏ EDIT MODE: ON' : '✏ EDIT MODE: OFF';
+            btn.classList.toggle('on', editOn);
+        }
+
+        // ── Edit modal ───────────────────────────────────────────────────────────────
+        function openModal(title, html, onSave) {
+            document.getElementById('edit-modal-ttl').textContent = title;
+            document.getElementById('edit-form-area').innerHTML = html;
+            document.getElementById('do-save').onclick = onSave;
+            document.getElementById('edit-modal').classList.add('on');
+        }
+        function closeEditModal() { document.getElementById('edit-modal').classList.remove('on'); }
+
+        // ── Edit: Hero ───────────────────────────────────────────────────────────────
+        function openHeroEdit() {
+            if (!isAdmin) return;
+            const h = DATA.hero;
+            openModal('EDIT HERO', `
     <div class="form-group">
       <label class="form-label">YOUR NAME</label>
       <input class="form-input" id="f-name" value="${esc(h.name)}"/>
@@ -1409,23 +1425,23 @@
       <p class="form-hint">Background banner image URL. <strong style="color:#f87171">Must be an actual image link (.jpg/.png/etc). Google Drive viewer links will NOT work.</strong></p>
     </div>
   `, () => {
-        DATA.hero = {
-          name: document.getElementById('f-name').value,
-          role: document.getElementById('f-role').value,
-          sub: document.getElementById('f-sub').value,
-          resumeUrl: document.getElementById('f-resume').value,
-          profilePic: document.getElementById('f-pic').value,
-          bannerUrl: document.getElementById('f-banner').value
-        };
-        save();
-      });
-    }
+                DATA.hero = {
+                    name: document.getElementById('f-name').value,
+                    role: document.getElementById('f-role').value,
+                    sub: document.getElementById('f-sub').value,
+                    resumeUrl: document.getElementById('f-resume').value,
+                    profilePic: document.getElementById('f-pic').value,
+                    bannerUrl: document.getElementById('f-banner').value
+                };
+                save();
+            });
+        }
 
-    // ── Edit: Skills ─────────────────────────────────────────────────────────────
-    function openEduEdit() {
-      if (!isAdmin) return;
-      const e = DATA.edu || DEFAULTS.edu;
-      openModal('EDIT COLLEGE DETAILS', `
+        // ── Edit: Skills ─────────────────────────────────────────────────────────────
+        function openEduEdit() {
+            if (!isAdmin) return;
+            const e = DATA.edu || DEFAULTS.edu;
+            openModal('EDIT COLLEGE DETAILS', `
     <div class="form-group">
       <label class="form-label">COLLEGE NAME</label>
       <input class="form-input" id="f-college" value="${esc(e.college)}"/>
@@ -1439,46 +1455,46 @@
       <textarea class="form-textarea" id="f-degrees">${esc(e.degrees)}</textarea>
     </div>
   `, () => {
-        DATA.edu = {
-          college: document.getElementById('f-college').value,
-          cgpa: document.getElementById('f-cgpa').value,
-          degrees: document.getElementById('f-degrees').value
-        };
-        save();
-      });
-    }
+                DATA.edu = {
+                    college: document.getElementById('f-college').value,
+                    cgpa: document.getElementById('f-cgpa').value,
+                    degrees: document.getElementById('f-degrees').value
+                };
+                save();
+            });
+        }
 
-    // ── Edit: Skills ─────────────────────────────────────────────────────────────
-    function openSkillsEdit() {
-      if (!isAdmin) return;
-      openModal('EDIT SKILLS', `
+        // ── Edit: Skills ─────────────────────────────────────────────────────────────
+        function openSkillsEdit() {
+            if (!isAdmin) return;
+            openModal('EDIT SKILLS', `
     <div class="form-group">
       <label class="form-label">SKILLS — ONE PER LINE</label>
       <textarea class="form-textarea" id="f-skills" style="min-height:180px">${(DATA.skills || []).join('\n')}</textarea>
       <p class="form-hint">Each line = one pill tag. Add, remove, or reorder freely.</p>
     </div>
   `, () => {
-        DATA.skills = document.getElementById('f-skills').value
-          .split('\n').map(s => s.trim()).filter(Boolean);
-        save();
-      });
-    }
+                DATA.skills = document.getElementById('f-skills').value
+                    .split('\n').map(s => s.trim()).filter(Boolean);
+                save();
+            });
+        }
 
-    // ── Edit: Project ─────────────────────────────────────────────────────────────
-    function openEditProject(i) {
-      if (!isAdmin) return;
-      openModal('EDIT PROJECT', projectForm(DATA.projects[i]), () => {
-        DATA.projects[i] = readProjectForm(); save();
-      });
-    }
-    function openAddProject() {
-      if (!isAdmin) return;
-      openModal('ADD PROJECT', projectForm({}), () => {
-        DATA.projects.push(readProjectForm()); save();
-      });
-    }
-    function projectForm(p) {
-      return `
+        // ── Edit: Project ─────────────────────────────────────────────────────────────
+        function openEditProject(i) {
+            if (!isAdmin) return;
+            openModal('EDIT PROJECT', projectForm(DATA.projects[i]), () => {
+                DATA.projects[i] = readProjectForm(); save();
+            });
+        }
+        function openAddProject() {
+            if (!isAdmin) return;
+            openModal('ADD PROJECT', projectForm({}), () => {
+                DATA.projects.push(readProjectForm()); save();
+            });
+        }
+        function projectForm(p) {
+            return `
     <div class="form-group">
       <label class="form-label">WINDOW TITLE</label>
       <input class="form-input" id="f-ptitle" value="${esc(p.title || '')}" placeholder="MY_PROJECT.EXE"/>
@@ -1507,28 +1523,28 @@
       </select>
     </div>
   `;
-    }
-    function readProjectForm() {
-      return {
-        title: document.getElementById('f-ptitle').value || 'PROJECT.EXE',
-        emoji: document.getElementById('f-pemoji').value || '📁',
-        desc: document.getElementById('f-pdesc').value || '',
-        tags: document.getElementById('f-ptags').value.split(',').map(s => s.trim()).filter(Boolean),
-        link: document.getElementById('f-plink').value || '#',
-        showWarning: document.getElementById('f-pwarn').value === 'true'
-      };
-    }
-    function deleteProject(i) {
-      if (!isAdmin) return;
-      if (!confirm('Delete this project?')) return;
-      DATA.projects.splice(i, 1); save();
-    }
+        }
+        function readProjectForm() {
+            return {
+                title: document.getElementById('f-ptitle').value || 'PROJECT.EXE',
+                emoji: document.getElementById('f-pemoji').value || '📁',
+                desc: document.getElementById('f-pdesc').value || '',
+                tags: document.getElementById('f-ptags').value.split(',').map(s => s.trim()).filter(Boolean),
+                link: document.getElementById('f-plink').value || '#',
+                showWarning: document.getElementById('f-pwarn').value === 'true'
+            };
+        }
+        function deleteProject(i) {
+            if (!isAdmin) return;
+            if (!confirm('Delete this project?')) return;
+            DATA.projects.splice(i, 1); save();
+        }
 
-    // ── Edit: Contact Links ───────────────────────────────────────────────────────
-    function openContactEdit() {
-      if (!isAdmin) return;
-      const c = DATA.contact;
-      openModal('EDIT CONTACT LINKS', `
+        // ── Edit: Contact Links ───────────────────────────────────────────────────────
+        function openContactEdit() {
+            if (!isAdmin) return;
+            const c = DATA.contact;
+            openModal('EDIT CONTACT LINKS', `
     <div class="form-group">
       <label class="form-label">📧 EMAIL</label>
       <input class="form-input" id="f-email" value="${esc(c.email)}" placeholder="mailto:you@gmail.com"/>
@@ -1545,189 +1561,189 @@
       <p class="form-hint">Full URL — e.g. <em>https://linkedin.com/in/aditya-karale</em></p>
     </div>
   `, () => {
-        DATA.contact = {
-          email: document.getElementById('f-email').value,
-          github: document.getElementById('f-gh').value,
-          linkedin: document.getElementById('f-li').value
-        };
-        save();
-      });
-    }
-
-    // ── Save ─────────────────────────────────────────────────────────────────────
-    function save() {
-      db.ref('portfolio').set(DATA)
-        .then(() => { closeEditModal(); renderAll(); showToast(); })
-        .catch(e => alert('Save failed: ' + e.message));
-    }
-    function showToast() {
-      const el = document.getElementById('save-toast');
-      el.style.display = 'block';
-      setTimeout(() => el.style.display = 'none', 2500);
-    }
-
-    // ── Login helpers ─────────────────────────────────────────────────────────────
-    function openLoginModal() { document.getElementById('login-modal').classList.add('on'); }
-    function closeLoginModal() { document.getElementById('login-modal').classList.remove('on'); setLoginErr(''); }
-    function setLoginErr(m) { document.getElementById('login-err').textContent = m; }
-
-    // ── Escape HTML ───────────────────────────────────────────────────────────────
-    function esc(s) {
-      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    // ── Sakura Glitch Effect ──────────────────────────────────────────────────────
-    const canvas = document.getElementById('sakuraCanvas');
-    const ctx = canvas.getContext('2d', { alpha: true });
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    class Sakura {
-      constructor() {
-        this.reset();
-        this.y = Math.random() * canvas.height; // random start across screen
-      }
-
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * -100 - 20;
-        this.size = (Math.random() * 2 + 2) * 3.5; // Scaled up 3.5x for larger pixel blocks
-        this.speedY = Math.random() * 0.8 + 0.3; // Calmer drift
-        this.speedX = Math.random() * 1.0 - 0.5;
-        this.angle = Math.random() * Math.PI * 2;
-        this.spin = (Math.random() - 0.5) * 0.02;
-        this.opacity = Math.random() * 0.4 + 0.4;
-
-        // Glitch properties
-        this.isGlitching = false;
-        this.glitchTimer = 0;
-      }
-
-      update() {
-        this.y += this.speedY;
-        this.x += this.speedX + Math.sin(this.angle) * 1.2; // sway
-        this.angle += this.spin;
-
-        if (this.y > canvas.height + 30) {
-          this.reset();
+                DATA.contact = {
+                    email: document.getElementById('f-email').value,
+                    github: document.getElementById('f-gh').value,
+                    linkedin: document.getElementById('f-li').value
+                };
+                save();
+            });
         }
 
-        // Random glitch trigger (rare: 1 in 1000 frames per particle approx)
-        if (!this.isGlitching && Math.random() < 0.0005) {
-          this.isGlitching = true;
-          this.glitchTimer = Math.random() * 10 + 5; // Glitch duration frames
+        // ── Save ─────────────────────────────────────────────────────────────────────
+        function save() {
+            db.ref('portfolio').set(DATA)
+                .then(() => { closeEditModal(); renderAll(); showToast(); })
+                .catch(e => alert('Save failed: ' + e.message));
+        }
+        function showToast() {
+            const el = document.getElementById('save-toast');
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 2500);
         }
 
-        if (this.isGlitching) {
-          this.glitchTimer--;
-          if (this.glitchTimer <= 0) {
-            this.isGlitching = false;
-          }
-        }
-      }
+        // ── Login helpers ─────────────────────────────────────────────────────────────
+        function openLoginModal() { document.getElementById('login-modal').classList.add('on'); }
+        function closeLoginModal() { document.getElementById('login-modal').classList.remove('on'); setLoginErr(''); }
+        function setLoginErr(m) { document.getElementById('login-err').textContent = m; }
 
-      draw() {
-        ctx.save();
-
-        let currentX = this.x;
-        let currentY = this.y;
-        let currentOp = this.opacity;
-
-        if (this.isGlitching) {
-          if (Math.random() < 0.6) currentX += (Math.random() - 0.5) * 80;
-          if (Math.random() < 0.6) currentY += (Math.random() - 0.5) * 15;
-          if (Math.random() < 0.6) currentOp = Math.random() * 0.1 + 0.05;
+        // ── Escape HTML ───────────────────────────────────────────────────────────────
+        function esc(s) {
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        ctx.translate(currentX, currentY);
-        // Only rotate if not glitching, glitch looks better statically aligned
-        if (!this.isGlitching) ctx.rotate(this.angle);
+        // ── Sakura Glitch Effect ──────────────────────────────────────────────────────
+        const canvas = document.getElementById('sakuraCanvas');
+        const ctx = canvas.getContext('2d', { alpha: true });
 
-        if (this.isGlitching && Math.random() < 0.5) {
-          if (Math.random() < 0.5) {
-            // Chromatic aberration blocky shift
-            ctx.fillStyle = "rgba(0, 255, 255, " + currentOp + ")";
-            this.drawPetal(16, 0);
-            ctx.fillStyle = "rgba(255, 0, 255, " + currentOp + ")";
-            this.drawPetal(-16, 0);
-          } else {
-             // Blocky static pattern
-             ctx.fillStyle = "cyan";
-             ctx.fillRect(-this.size*3, -this.size, this.size*2, this.size*3);
-             ctx.fillStyle = "magenta";
-             ctx.fillRect(this.size, -this.size*2, this.size*3, this.size*2);
-             ctx.fillStyle = "rgba(255, 255, 255, " + currentOp + ")";
-             ctx.fillRect(-this.size, this.size, this.size*4, this.size);
-          }
-        } else {
-          ctx.fillStyle = "rgba(255, 183, 197, " + currentOp + ")";
-          this.drawPetal(0, 0);
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Sakura {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height; // random start across screen
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * -100 - 20;
+                this.size = (Math.random() * 2 + 2) * 3.5; // Scaled up 3.5x for larger pixel blocks
+                this.speedY = Math.random() * 0.8 + 0.3; // Calmer drift
+                this.speedX = Math.random() * 1.0 - 0.5;
+                this.angle = Math.random() * Math.PI * 2;
+                this.spin = (Math.random() - 0.5) * 0.02;
+                this.opacity = Math.random() * 0.4 + 0.4;
+
+                // Glitch properties
+                this.isGlitching = false;
+                this.glitchTimer = 0;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX + Math.sin(this.angle) * 1.2; // sway
+                this.angle += this.spin;
+
+                if (this.y > canvas.height + 30) {
+                    this.reset();
+                }
+
+                // Random glitch trigger (rare: 1 in 1000 frames per particle approx)
+                if (!this.isGlitching && Math.random() < 0.0005) {
+                    this.isGlitching = true;
+                    this.glitchTimer = Math.random() * 10 + 5; // Glitch duration frames
+                }
+
+                if (this.isGlitching) {
+                    this.glitchTimer--;
+                    if (this.glitchTimer <= 0) {
+                        this.isGlitching = false;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.save();
+
+                let currentX = this.x;
+                let currentY = this.y;
+                let currentOp = this.opacity;
+
+                if (this.isGlitching) {
+                    if (Math.random() < 0.6) currentX += (Math.random() - 0.5) * 80;
+                    if (Math.random() < 0.6) currentY += (Math.random() - 0.5) * 15;
+                    if (Math.random() < 0.6) currentOp = Math.random() * 0.1 + 0.05;
+                }
+
+                ctx.translate(currentX, currentY);
+                // Only rotate if not glitching, glitch looks better statically aligned
+                if (!this.isGlitching) ctx.rotate(this.angle);
+
+                if (this.isGlitching && Math.random() < 0.5) {
+                    if (Math.random() < 0.5) {
+                        // Chromatic aberration blocky shift
+                        ctx.fillStyle = "rgba(0, 255, 255, " + currentOp + ")";
+                        this.drawPetal(16, 0);
+                        ctx.fillStyle = "rgba(255, 0, 255, " + currentOp + ")";
+                        this.drawPetal(-16, 0);
+                    } else {
+                        // Blocky static pattern
+                        ctx.fillStyle = "cyan";
+                        ctx.fillRect(-this.size * 3, -this.size, this.size * 2, this.size * 3);
+                        ctx.fillStyle = "magenta";
+                        ctx.fillRect(this.size, -this.size * 2, this.size * 3, this.size * 2);
+                        ctx.fillStyle = "rgba(255, 255, 255, " + currentOp + ")";
+                        ctx.fillRect(-this.size, this.size, this.size * 4, this.size);
+                    }
+                } else {
+                    ctx.fillStyle = "rgba(255, 183, 197, " + currentOp + ")";
+                    this.drawPetal(0, 0);
+                }
+
+                ctx.restore();
+            }
+
+            drawPetal(x, y) {
+                // Blocky pixel-art sprite (cluster of squares)
+                const s = Math.round(this.size);
+                ctx.fillRect(x - s, y - s * 2, s * 2, s * 4); // Vertical stem
+                ctx.fillRect(x - s * 2, y - s, s * 4, s * 2); // Horizontal cross
+            }
         }
 
-        ctx.restore();
-      }
+        const sakuras = [];
+        const particleCount = Math.min(Math.floor(window.innerWidth / 80), 8); // Sparse: 5-8 particles max
+        for (let i = 0; i < particleCount; i++) {
+            sakuras.push(new Sakura());
+        }
 
-      drawPetal(x, y) {
-        // Blocky pixel-art sprite (cluster of squares)
-        const s = Math.round(this.size);
-        ctx.fillRect(x - s, y - s*2, s*2, s*4); // Vertical stem
-        ctx.fillRect(x - s*2, y - s, s*4, s*2); // Horizontal cross
-      }
-    }
+        let globalTime = 0;
+        function drawBranches() {
+            ctx.save();
+            // Blocky static dark branches
+            ctx.fillStyle = "#5c5055"; // Muted, desaturated purple/brown for better visibility
+            const s = 14; // Pixel size for tree blocks (increased from 10 to 14)
 
-    const sakuras = [];
-    const particleCount = Math.min(Math.floor(window.innerWidth / 80), 8); // Sparse: 5-8 particles max
-    for (let i = 0; i < particleCount; i++) {
-      sakuras.push(new Sakura());
-    }
+            // Top Left pixelation coords [x, y, w, h] multipliers
+            const branchL = [
+                [0, 0, 4, 14], [4, 4, 4, 2], [4, 6, 8, 4], [12, 6, 4, 2],
+                [8, 10, 4, 4], [12, 12, 6, 2], [16, 14, 4, 2],
+                [0, 14, 2, 8], [2, 18, 4, 4], [6, 20, 2, 2]
+            ];
+            branchL.forEach(b => ctx.fillRect(b[0] * s, b[1] * s, b[2] * s, b[3] * s));
 
-    let globalTime = 0;
-    function drawBranches() {
-      ctx.save();
-      // Blocky static dark branches
-      ctx.fillStyle = "#5c5055"; // Muted, desaturated purple/brown for better visibility
-      const s = 14; // Pixel size for tree blocks (increased from 10 to 14)
-      
-      // Top Left pixelation coords [x, y, w, h] multipliers
-      const branchL = [
-        [0,0, 4,14], [4,4, 4,2], [4,6, 8,4], [12,6, 4,2],
-        [8,10, 4,4], [12,12, 6,2], [16,14, 4,2],
-        [0,14, 2,8], [2,18, 4,4], [6,20, 2,2]
-      ];
-      branchL.forEach(b => ctx.fillRect(b[0]*s, b[1]*s, b[2]*s, b[3]*s));
+            // Top Right
+            ctx.translate(canvas.width, 0);
+            const branchR = [
+                [-4, 0, 4, 16], [-8, 6, 4, 4], [-12, 8, 4, 6],
+                [-16, 12, 4, 2], [-20, 10, 4, 2],
+                [-8, 18, 4, 2], [-14, 20, 6, 2], [-18, 22, 4, 2]
+            ];
+            branchR.forEach(b => ctx.fillRect(b[0] * s, b[1] * s, b[2] * s, b[3] * s));
+            ctx.restore();
+        }
 
-      // Top Right
-      ctx.translate(canvas.width, 0);
-      const branchR = [
-        [-4,0, 4,16], [-8,6, 4,4], [-12,8, 4,6],
-        [-16,12, 4,2], [-20,10, 4,2],
-        [-8,18, 4,2], [-14,20, 6,2], [-18,22, 4,2]
-      ];
-      branchR.forEach(b => ctx.fillRect(b[0]*s, b[1]*s, b[2]*s, b[3]*s));
-      ctx.restore();
-    }
+        function animateSakura() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            globalTime++;
 
-    function animateSakura() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      globalTime++;
+            drawBranches();
 
-      drawBranches();
+            sakuras.forEach(s => {
+                s.update();
+                s.draw();
+            });
 
-      sakuras.forEach(s => {
-        s.update();
-        s.draw();
-      });
+            requestAnimationFrame(animateSakura);
+        }
 
-      requestAnimationFrame(animateSakura);
-    }
-
-    animateSakura();
-  </script>
+        animateSakura();
+    </script>
 </body>
 
-</html>
+  </html>
