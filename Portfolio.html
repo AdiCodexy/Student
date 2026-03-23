@@ -12,8 +12,29 @@
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0c0c10; color: #e2e8f0; font-family: 'Share Tech Mono', monospace; min-height: 100vh; }
-body.admin-active { padding-top: 50px; }
+    body {
+      background: #0c0c10;
+      color: #e2e8f0;
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      background-attachment: fixed;
+      isolation: isolate;
+    }
+    body.admin-active { padding-top: 50px; }
+    body::before{
+      content:'';
+      position:fixed;
+      inset:-60px;
+      z-index:-1;
+      pointer-events:none;
+      filter: blur(35px);
+      opacity:.9;
+      background:
+        radial-gradient(ellipse 60% 50% at 75% 10%, rgba(167,139,250,.22) 0%, transparent 60%),
+        radial-gradient(ellipse 45% 35% at 15% 85%, rgba(52,211,153,.18) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 40% at 40% 55%, rgba(30,58,138,.14) 0%, transparent 62%);
+      animation: driftBg 12s ease-in-out infinite;
+    }
 
 /* ── Admin Bar ── */
 #admin-bar {
@@ -95,6 +116,9 @@ body.edit-mode #add-proj-btn { display:block; }
 @keyframes fadeIn    { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
 @keyframes glowPulse { 0%,100%{box-shadow:0 0 8px #4ade8066,inset -4px -4px 0 #166534,inset 4px 4px 0 #86efac} 50%{box-shadow:0 0 28px #4ade80aa,inset -4px -4px 0 #166534,inset 4px 4px 0 #86efac} }
+@keyframes driftBg { 0%,100%{ transform: translate3d(0,0,0) } 50%{ transform: translate3d(18px,-10px,0) } }
+@keyframes avatarIn { from{ opacity:0; filter: blur(6px) } to{ opacity:1; filter: blur(0) } }
+@keyframes avatarFloat { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-6px) } }
 .fade-in { animation: fadeIn .7s ease-out forwards; }
 
 /* ── Layout ── */
@@ -109,7 +133,17 @@ body.edit-mode #add-proj-btn { display:block; }
 
 /* ── Hero ── */
 .hero-inner { position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; padding:52px 24px; gap:14px; }
-#profile-pic { width:90px; height:90px; object-fit:cover; border:3px solid #4ade80; display:none; margin-bottom:6px; }
+#profile-pic {
+  width:90px;
+  height:90px;
+  object-fit:cover;
+  border:3px solid #4ade80;
+  display:none;
+  margin-bottom:6px;
+  border-radius: 9999px;
+  box-shadow: 0 0 18px rgba(74,222,128,.18);
+  animation: avatarIn .7s ease-out both, avatarFloat 4.2s ease-in-out infinite;
+}
 .start-btn { font-family:'Press Start 2P',monospace; font-size:11px; letter-spacing:2px; color:#fff; background:#16a34a; border:3px solid #14532d; padding:13px 30px; cursor:pointer; animation:glowPulse 2.4s ease-in-out infinite; margin-top:8px; transition:filter .1s; text-decoration:none; display:inline-block; }
 .start-btn:hover { filter:brightness(1.18); }
 .start-btn:active { transform:translate(2px,2px); animation:none; }
@@ -231,7 +265,7 @@ svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
         </div>
       </div>
       <div class="hero-inner">
-        <img id="profile-pic" src="" alt="Profile Photo"/>
+        <img id="profile-pic" src="" alt="Profile Photo" onerror="this.style.display='none'"/>
         <p style="font-family:'Press Start 2P',monospace;font-size:8px;color:#374151;position:relative;z-index:3">&gt;&gt;&gt; SYSTEM READY</p>
         <div class="editable-zone" style="position:relative;z-index:3;width:100%">
           <button class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
@@ -334,6 +368,26 @@ svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
 
 <!-- ══════════ SCRIPT ══════════ -->
 <script>
+// Convert Google Drive "share" links into direct image URLs that browsers can load as <img>.
+function normalizeProfileImageUrl(url) {
+  const u = String(url || "").trim();
+  if (!u) return "";
+
+  // If it's already a direct image URL (or another host), keep it.
+  if (!u.includes("drive.google.com")) return u;
+
+  // Supported formats:
+  // - https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+  // - https://drive.google.com/open?id=FILE_ID
+  // - https://drive.google.com/uc?export=view&id=FILE_ID
+  const fileId =
+    (u.match(/\/file\/d\/([^\/?#]+)/i) || [])[1] ||
+    (u.match(/[?&]id=([^&]+)/i) || [])[1];
+
+  if (!fileId) return u;
+  return `https://drive.google.com/uc?export=view&id=${fileId}`;
+}
+
 const ADMIN_EMAIL = 'aditya7karale@gmail.com';
 
 firebase.initializeApp({
@@ -388,7 +442,8 @@ function renderHero() {
   document.getElementById('d-sub').textContent  = h.sub  || '';
   document.getElementById('d-resume').href      = h.resumeUrl || '#';
   const pic = document.getElementById('profile-pic');
-  if (h.profilePic) { pic.src = h.profilePic; pic.style.display = 'block'; }
+  const normalized = normalizeProfileImageUrl(h.profilePic);
+  if (normalized) { pic.src = normalized; pic.style.display = 'block'; }
   else { pic.style.display = 'none'; }
 }
 
