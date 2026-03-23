@@ -109,7 +109,7 @@ body.edit-mode #add-proj-btn { display:block; }
 
 /* ── Hero ── */
 .hero-inner { position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; padding:52px 24px; gap:14px; }
-#profile-pic { width:90px; height:90px; object-fit:cover; border:3px solid #4ade80; display:none; margin-bottom:6px; }
+#profile-pic { width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #4ade80; box-shadow:0 0 20px #4ade8066; display:none; margin-bottom:12px; }
 .start-btn { font-family:'Press Start 2P',monospace; font-size:11px; letter-spacing:2px; color:#fff; background:#16a34a; border:3px solid #14532d; padding:13px 30px; cursor:pointer; animation:glowPulse 2.4s ease-in-out infinite; margin-top:8px; transition:filter .1s; text-decoration:none; display:inline-block; }
 .start-btn:hover { filter:brightness(1.18); }
 .start-btn:active { transform:translate(2px,2px); animation:none; }
@@ -165,10 +165,11 @@ svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   z-index: -1;
   pointer-events: none;
+  display: block;
 }
 </style>
 </head>
@@ -402,8 +403,20 @@ function renderHero() {
   document.getElementById('d-sub').textContent  = h.sub  || '';
   document.getElementById('d-resume').href      = h.resumeUrl || '#';
   const pic = document.getElementById('profile-pic');
-  if (h.profilePic) { pic.src = h.profilePic; pic.style.display = 'block'; }
-  else { pic.style.display = 'none'; }
+  const fallbackPic = "https://api.dicebear.com/7.x/pixel-art/svg?seed=Captain&backgroundColor=10121a";
+  
+  if (h.profilePic) { 
+    pic.src = h.profilePic; 
+    pic.style.display = 'block'; 
+    pic.onerror = function() {
+      if (this.src !== fallbackPic) {
+        this.src = fallbackPic;
+      }
+    };
+  } else { 
+    pic.src = fallbackPic;
+    pic.style.display = 'block'; 
+  }
 }
 
 function renderSkills() {
