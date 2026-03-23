@@ -528,12 +528,10 @@
     .hero-inner {
       position: relative;
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 52px 24px;
-      gap: 20px;
-      flex-wrap: wrap;
+      text-align: center;
+      padding: 0 24px 52px;
     }
 
     .hero-left {
@@ -541,18 +539,19 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      flex: 1;
-      min-width: 250px;
+      width: 100%;
     }
 
     .hero-right {
       border: 1px solid #374151;
       padding: 18px;
-      min-width: 280px;
+      width: 100%;
+      max-width: 480px;
       background: #0e1018;
-      flex: 1;
       position: relative;
       z-index: 3;
+      margin-top: 36px;
+      text-align: left;
     }
 
     .edu-title {
@@ -1402,12 +1401,12 @@
     <div class="form-group">
       <label class="form-label">PROFILE PHOTO URL</label>
       <input class="form-input" id="f-pic" value="${esc(h.profilePic)}" placeholder="https://i.imgur.com/yourphoto.jpg"/>
-      <p class="form-hint">Upload your photo to <b>imgur.com</b> → right-click image → Copy image address. Paste it here.</p>
+      <p class="form-hint">Upload your photo to <b>imgur.com</b> → right-click image → Copy image address. Paste it here. <strong style="color:#f87171">Google Drive URLs will NOT work directly.</strong></p>
     </div>
     <div class="form-group">
       <label class="form-label">BANNER IMAGE URL</label>
       <input class="form-input" id="f-banner" value="${esc(h.bannerUrl)}" placeholder="https://i.imgur.com/yourbanner.jpg"/>
-      <p class="form-hint">Background banner image URL behind your profile picture.</p>
+      <p class="form-hint">Background banner image URL. <strong style="color:#f87171">Must be an actual image link (.jpg/.png/etc). Google Drive viewer links will NOT work.</strong></p>
     </div>
   `, () => {
         DATA.hero = {
