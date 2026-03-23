@@ -115,7 +115,7 @@ body.edit-mode #add-proj-btn { display:block; }
 /* ── Animations ── */
 @keyframes fadeIn    { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
-@keyframes glowPulse { 0%,100%{box-shadow:0 0 8px #4ade8066,inset -4px -4px 0 #166534,inset 4px 4px 0 #86efac} 50%{box-shadow:0 0 28px #4ade80aa,inset -4px -4px 0 #166534,inset 4px 4px 0 #86efac} }
+@keyframes glowPulse { 0%,100%{box-shadow:0 0 4px #4ade8033,inset -3px -3px 0 #166534,inset 3px 3px 0 #86efac} 50%{box-shadow:0 0 10px #4ade8055,inset -3px -3px 0 #166534,inset 3px 3px 0 #86efac} }
 @keyframes driftBg { 0%,100%{ transform: translate3d(0,0,0) } 50%{ transform: translate3d(18px,-10px,0) } }
 @keyframes avatarIn { from{ opacity:0; filter: blur(6px) } to{ opacity:1; filter: blur(0) } }
 @keyframes avatarFloat { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-6px) } }
@@ -163,6 +163,7 @@ body.edit-mode #add-proj-btn { display:block; }
   padding: 18px 22px 24px;
 }
 .hero-left { display:flex; flex-direction:column; align-items:flex-start; }
+.hero-left, .hero-right { position: relative; z-index: 4; }
 .hero-right {
   border:1px solid #374151;
   background:#0e1018;
@@ -210,6 +211,7 @@ body.edit-mode #add-proj-btn { display:block; }
 .start-btn { font-family:'Press Start 2P',monospace; font-size:11px; letter-spacing:2px; color:#fff; background:#16a34a; border:3px solid #14532d; padding:13px 30px; cursor:pointer; animation:glowPulse 2.4s ease-in-out infinite; margin-top:8px; transition:filter .1s; text-decoration:none; display:inline-block; }
 .start-btn:hover { filter:brightness(1.18); }
 .start-btn:active { transform:translate(2px,2px); animation:none; }
+.edit-pencil { position: relative; z-index: 30; pointer-events: auto; }
 
 /* ── Skills ── */
 .tags { display:flex; flex-wrap:wrap; gap:8px; }
@@ -335,7 +337,7 @@ svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
         <div class="hero-content">
           <div class="hero-left">
             <div class="editable-zone" style="width:100%">
-              <button class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
+              <button type="button" class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
             </div>
 
             <div class="avatar-wrap">
@@ -360,13 +362,13 @@ svg.px { image-rendering:pixelated; shape-rendering:crispEdges; }
 
           <div class="hero-right">
             <div class="editable-zone">
-              <button class="edit-pencil" onclick="openEducationEdit()">✏ EDIT EDUCATION</button>
+              <button type="button" class="edit-pencil" onclick="openEducationEdit()">✏ EDIT EDUCATION</button>
             </div>
             <div class="mini-ttl">COLLEGE_DETAILS</div>
             <div class="kv">
               <div><b>COLLEGE:</b> <span class="val" id="d-college"></span></div>
               <div><b>CGPA:</b> <span class="val" id="d-cgpa"></span></div>
-              <div style="margin-top:6px"><b>ADDRESS:</b><br/><span class="val" id="d-college-address" style="white-space:pre-wrap; word-break:break-word;"></span></div>
+              <div style="margin-top:6px"><b>DEGREES:</b><br/><span class="val" id="d-degrees" style="white-space:pre-wrap; word-break:break-word;"></span></div>
             </div>
           </div>
         </div>
@@ -507,7 +509,7 @@ const db   = firebase.database();
 // Default data
 const DEFAULTS = {
   hero:     { name:"YOUR NAME", role:"Student Developer · UI/UX Enthusiast", sub:"Building cool things — one commit at a time", resumeUrl:"#", profilePic:"", bannerUrl:"" },
-  education:{ collegeName:"", cgpa:"", collegeAddress:"" },
+  education:{ collegeName:"", cgpa:"", degrees:"" },
   skills:   ["React","TypeScript","JavaScript","Python","Tailwind CSS","Node.js","GitHub","HTML/CSS","SQL","Figma"],
   projects: [
     { title:"PORTFOLIO.EXE",   emoji:"🌐", desc:"Personal portfolio with pixel-art aesthetic and animations.",  tags:["React","Tailwind","JS"],  link:"#", showWarning:false },
@@ -599,7 +601,7 @@ function renderEducation() {
   const ed = DATA.education || DEFAULTS.education;
   document.getElementById('d-college').textContent = ed.collegeName || '';
   document.getElementById('d-cgpa').textContent = ed.cgpa || '';
-  document.getElementById('d-college-address').textContent = ed.collegeAddress || '';
+  document.getElementById('d-degrees').textContent = ed.degrees || ed.collegeAddress || '';
 }
 
 function renderSkills() {
@@ -787,15 +789,15 @@ function openEducationEdit() {
       <input class="form-input" id="f-cgpa" value="${esc(ed.cgpa)}" placeholder="e.g. 8.65"/>
     </div>
     <div class="form-group">
-      <label class="form-label">COLLEGE ADDRESS</label>
-      <textarea class="form-textarea" id="f-caddr" style="min-height:90px">${esc(ed.collegeAddress)}</textarea>
+      <label class="form-label">DEGREES</label>
+      <textarea class="form-textarea" id="f-degrees" style="min-height:90px">${esc(ed.degrees || ed.collegeAddress || '')}</textarea>
       <p class="form-hint">Supports multiple lines.</p>
     </div>
   `, () => {
     DATA.education = {
       collegeName:    document.getElementById('f-college').value,
       cgpa:           document.getElementById('f-cgpa').value,
-      collegeAddress:document.getElementById('f-caddr').value
+      degrees:        document.getElementById('f-degrees').value
     };
     save();
   });
