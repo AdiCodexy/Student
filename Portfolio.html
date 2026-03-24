@@ -674,6 +674,32 @@
         }
 
         /* ── Skills ── */
+        .skill-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .skill-category-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .skill-category-label {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            color: #4ade80;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-left: 2px;
+        }
+
+        .skill-category-label::before {
+            content: '> ';
+            color: #6b7280;
+        }
+
         .tags {
             display: flex;
             flex-wrap: wrap;
@@ -689,13 +715,25 @@
             padding: 8px 15px;
             border-radius: 9999px;
             cursor: default;
-            transition: background .15s, color .15s, border-color .15s;
+            transition: all .15s;
+            position: relative;
         }
 
         .tag:hover {
-            background: #4ade80;
-            color: #000;
+            color: #4ade80;
             border-color: #4ade80;
+            background: #0d2818;
+            text-shadow: 0 0 8px #4ade8088, 0 0 16px #4ade8044;
+            box-shadow: 0 0 8px #4ade8033, inset 0 0 8px #4ade8011;
+            animation: tagGlitch .15s steps(2) 1;
+        }
+
+        @keyframes tagGlitch {
+            0% { transform: translate(0); }
+            25% { transform: translate(-2px, 1px); }
+            50% { transform: translate(2px, -1px); }
+            75% { transform: translate(-1px, -1px); }
+            100% { transform: translate(0); }
         }
 
         /* ── Projects ── */
@@ -710,12 +748,23 @@
             background: #0e1018;
             position: relative;
             overflow: hidden;
-            transition: transform .18s, box-shadow .18s;
+            transition: transform .18s, box-shadow .18s, border-color .18s;
         }
 
         .project-card:hover {
             transform: translate(-3px, -3px);
             box-shadow: 6px 6px 0 #1f2937, 10px 10px 0 #0a0a0e;
+            border-color: #4ade80;
+            animation: cardGlitch .2s steps(3) 1;
+        }
+
+        @keyframes cardGlitch {
+            0% { border-color: #4ade80; }
+            20% { border-color: #f87171; transform: translate(-3px, -3px); }
+            40% { border-color: #60a5fa; transform: translate(-2px, -4px); }
+            60% { border-color: #facc15; transform: translate(-4px, -2px); }
+            80% { border-color: #a78bfa; transform: translate(-3px, -3px); }
+            100% { border-color: #4ade80; transform: translate(-3px, -3px); }
         }
 
         .card-bar {
@@ -1602,7 +1651,12 @@
         const DEFAULTS = {
             hero: { name: "YOUR NAME", role: "Student Developer · UI/UX Enthusiast", sub: "Building cool things — one commit at a time", resumeUrl: "#", profilePic: "https://raw.githubusercontent.com/AdiCodexy/Student/main/MyProfilePic.jpg", bannerUrl: "https://raw.githubusercontent.com/AdiCodexy/Student/main/MyBannerPic.jpg" },
             edu: { college: "Your College", cgpa: "9.0", degrees: "Your Degree" },
-            skills: ["React", "TypeScript", "JavaScript", "Python", "Tailwind CSS", "Node.js", "GitHub", "HTML/CSS", "SQL", "Figma"],
+            skills: {
+                "Languages": ["Python", "SQL"],
+                "Libraries & Frameworks": ["PyTorch", "Scikit-learn", "Pandas", "NumPy", "Matplotlib", "Seaborn"],
+                "Tools & Platforms": ["GitHub", "PostgreSQL"],
+                "Concepts": ["Machine Learning", "Data Science"]
+            },
             projects: [
                 { title: "PORTFOLIO.EXE", emoji: "🌐", desc: "Personal portfolio with pixel-art aesthetic and animations.", tags: ["React", "Tailwind", "JS"], link: "#", showWarning: false },
                 { title: "WEATHER_APP.EXE", emoji: "⛅", desc: "Real-time weather dashboard powered by OpenWeather API.", tags: ["Python", "API", "CSS"], link: "#", showWarning: true },
@@ -1626,7 +1680,7 @@
                 DATA = {
                     hero: d.hero || DEFAULTS.hero,
                     edu: d.edu || DEFAULTS.edu,
-                    skills: d.skills || DEFAULTS.skills,
+                    skills: Array.isArray(d.skills) ? { "General": d.skills } : (d.skills || DEFAULTS.skills),
                     projects: d.projects || DEFAULTS.projects,
                     contact: d.contact || DEFAULTS.contact
                 };
@@ -1680,8 +1734,24 @@
         }
 
         function renderSkills() {
-            document.getElementById('d-skills').innerHTML =
-                (DATA.skills || []).map(s => `<span class="tag">${esc(s)}</span>`).join('');
+            const skills = DATA.skills || DEFAULTS.skills;
+            const container = document.getElementById('d-skills');
+            
+            // Backward compat: if skills is a flat array, wrap it
+            if (Array.isArray(skills)) {
+                container.className = 'tags';
+                container.innerHTML = skills.map(s => `<span class="tag">${esc(s)}</span>`).join('');
+                return;
+            }
+            
+            // Categorized skills
+            container.className = 'skill-categories';
+            container.innerHTML = Object.entries(skills).map(([cat, items]) => `
+                <div class="skill-category-group">
+                    <div class="skill-category-label">${esc(cat)}</div>
+                    <div class="tags">${(items || []).map(s => `<span class="tag">${esc(s)}</span>`).join('')}</div>
+                </div>
+            `).join('');
         }
 
         function renderProjects() {
@@ -1881,15 +1951,66 @@
         // ── Edit: Skills ─────────────────────────────────────────────────────────────
         function openSkillsEdit() {
             if (!isAdmin) return;
-            openModal('EDIT SKILLS', `
-    <div class="form-group">
-      <label class="form-label">SKILLS — ONE PER LINE</label>
-      <textarea class="form-textarea" id="f-skills" style="min-height:180px">${(DATA.skills || []).join('\n')}</textarea>
-      <p class="form-hint">Each line = one pill tag. Add, remove, or reorder freely.</p>
-    </div>
-  `, () => {
-                DATA.skills = document.getElementById('f-skills').value
-                    .split('\n').map(s => s.trim()).filter(Boolean);
+            const skills = DATA.skills || DEFAULTS.skills;
+            
+            let formHtml = '';
+            if (Array.isArray(skills)) {
+                formHtml = `
+                    <div style="border:1px solid #1f2937;padding:12px;margin-bottom:12px;background:#12151f">
+                        <div class="form-group">
+                            <label class="form-label">CATEGORY NAME</label>
+                            <input class="form-input skill-cat-input" value="General"/>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label">SKILLS — ONE PER LINE</label>
+                            <textarea class="form-textarea skill-items-input" style="min-height:120px">${skills.join('\n')}</textarea>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const cats = Object.entries(skills);
+                formHtml = cats.map(([cat, items]) => `
+                    <div style="border:1px solid #1f2937;padding:12px;margin-bottom:12px;background:#12151f">
+                        <div class="form-group">
+                            <label class="form-label">CATEGORY NAME</label>
+                            <input class="form-input skill-cat-input" value="${esc(cat)}"/>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label">SKILLS — ONE PER LINE</label>
+                            <textarea class="form-textarea skill-items-input" style="min-height:100px">${(items || []).join('\n')}</textarea>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            formHtml += `
+                <div style="border:1px dashed #166534;padding:12px;background:#051a0e">
+                    <div class="form-group">
+                        <label class="form-label" style="color:#4ade80">+ ADD NEW CATEGORY</label>
+                        <input class="form-input skill-cat-input" placeholder="e.g. DevOps"/>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                        <label class="form-label">SKILLS — ONE PER LINE</label>
+                        <textarea class="form-textarea skill-items-input" style="min-height:60px" placeholder="One skill per line"></textarea>
+                    </div>
+                </div>
+                <p class="form-hint" style="margin-top:10px">Empty categories will be removed on save.</p>
+            `;
+
+            openModal('EDIT SKILLS', formHtml, () => {
+                const newSkills = {};
+                const catInputs = document.querySelectorAll('.skill-cat-input');
+                const itemInputs = document.querySelectorAll('.skill-items-input');
+                
+                catInputs.forEach((catEl, i) => {
+                    const catName = catEl.value.trim();
+                    const catSkills = itemInputs[i].value.split('\n').map(s => s.trim()).filter(Boolean);
+                    if (catName && catSkills.length > 0) {
+                        newSkills[catName] = catSkills;
+                    }
+                });
+                
+                DATA.skills = newSkills;
                 save();
             });
         }
@@ -2396,4 +2517,4 @@
     </script>
 </body>
 
-                                  </html>
+    </html>
