@@ -566,10 +566,12 @@
                 align-items: center;
                 padding: 0 24px 40px;
             }
+
             .hero-left {
                 align-items: center;
                 text-align: center;
             }
+
             .hero-right {
                 max-width: 480px;
                 margin-top: 20px;
@@ -729,11 +731,25 @@
         }
 
         @keyframes tagGlitch {
-            0% { transform: translate(0); }
-            25% { transform: translate(-2px, 1px); }
-            50% { transform: translate(2px, -1px); }
-            75% { transform: translate(-1px, -1px); }
-            100% { transform: translate(0); }
+            0% {
+                transform: translate(0);
+            }
+
+            25% {
+                transform: translate(-2px, 1px);
+            }
+
+            50% {
+                transform: translate(2px, -1px);
+            }
+
+            75% {
+                transform: translate(-1px, -1px);
+            }
+
+            100% {
+                transform: translate(0);
+            }
         }
 
         /* ── Projects ── */
@@ -759,12 +775,34 @@
         }
 
         @keyframes cardGlitch {
-            0% { border-color: #4ade80; }
-            20% { border-color: #f87171; transform: translate(-3px, -3px); }
-            40% { border-color: #60a5fa; transform: translate(-2px, -4px); }
-            60% { border-color: #facc15; transform: translate(-4px, -2px); }
-            80% { border-color: #a78bfa; transform: translate(-3px, -3px); }
-            100% { border-color: #4ade80; transform: translate(-3px, -3px); }
+            0% {
+                border-color: #4ade80;
+            }
+
+            20% {
+                border-color: #f87171;
+                transform: translate(-3px, -3px);
+            }
+
+            40% {
+                border-color: #60a5fa;
+                transform: translate(-2px, -4px);
+            }
+
+            60% {
+                border-color: #facc15;
+                transform: translate(-4px, -2px);
+            }
+
+            80% {
+                border-color: #a78bfa;
+                transform: translate(-3px, -3px);
+            }
+
+            100% {
+                border-color: #4ade80;
+                transform: translate(-3px, -3px);
+            }
         }
 
         .card-bar {
@@ -1341,24 +1379,24 @@
             background: #451a1a;
         }
 
-        /* ── Sakura Canvas ── */
-        #sakuraCanvas {
+        /* ── CRT Glitch Canvas ── */
+        #crtCanvas {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             z-index: -1;
             pointer-events: none;
-            display: block;
+            background-color: #0a0a10;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- ── Sakura Canvas ── -->
-    <canvas id="sakuraCanvas"></canvas>
+    <!-- ── CRT Glitch Canvas ── -->
+    <canvas id="crtCanvas"></canvas>
 
     <!-- ── Admin Bar ── -->
     <div id="admin-bar">
@@ -1432,203 +1470,205 @@
                             <div class="dot" style="background:#ef4444"></div>
                         </div>
                     </div>
-                <!-- Banner Image Area -->
-                <div class="hero-banner" id="d-banner"></div>
-                <div class="hero-inner">
-                    <div class="hero-left">
-                        <div class="pfp-wrapper">
-                            <img id="profile-pic" src="" alt="Profile Photo" />
-                            <div class="status-badge">
-                                <div class="status-badge-inner"></div>
+                    <!-- Banner Image Area -->
+                    <div class="hero-banner" id="d-banner"></div>
+                    <div class="hero-inner">
+                        <div class="hero-left">
+                            <div class="pfp-wrapper">
+                                <img id="profile-pic" src="" alt="Profile Photo" />
+                                <div class="status-badge">
+                                    <div class="status-badge-inner"></div>
+                                </div>
                             </div>
+                            <p
+                                style="font-family:'Press Start 2P',monospace;font-size:8px;color:#d1d5db;position:relative;z-index:3">
+                                &gt;&gt;&gt; SYSTEM READY</p>
+                            <div class="editable-zone" style="position:relative;z-index:3;width:100%">
+                                <button class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
+                                <h1
+                                    style="font-family:'Press Start 2P',monospace;font-size:clamp(14px,3vw,22px);line-height:1.9;color:#fff">
+                                    HI, I'M<br />
+                                    <span id="d-name" style="color:#4ade80;text-shadow:0 0 24px #4ade8055">YOUR
+                                        NAME</span>
+                                </h1>
+                                <p id="d-role" style="font-size:15px;color:#d1d5db;margin-top:10px">Student Developer ·
+                                    UI/UX Enthusiast
+                                </p>
+                                <p id="d-sub" style="font-size:12px;color:#d1d5db;margin-top:6px">Building cool things —
+                                    one
+                                    commit at a
+                                    time</p>
+                                <a id="d-resume" href="#" class="start-btn" style="margin-top:16px">&#9660; DOWNLOAD
+                                    RESUME</a>
+                            </div>
+
+                        </div>
+
+                        <div class="hero-right editable-zone">
+                            <button class="edit-pencil" onclick="openEduEdit()"
+                                style="position:absolute;top:-15px;right:0;">✏ EDIT EDU</button>
+                            <div class="edu-title">COLLEGE_DETAILS</div>
+                            <div class="edu-line"><strong>COLLEGE:</strong> <span id="d-college">IIT Madras</span></div>
+                            <div class="edu-line"><strong>CGPA:</strong> <span id="d-cgpa">7.2</span></div>
+                            <div class="edu-line"><strong>DEGREES:</strong> <span id="d-degrees">BTech</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SKILLS -->
+            <section>
+                <div class="window">
+                    <div class="win-bar" style="background:#1e293b">
+                        <span class="win-title">SKILLS.DAT</span>
+                        <div class="win-dots">
+                            <div class="dot" style="background:#eab308"></div>
+                            <div class="dot" style="background:#22c55e"></div>
+                            <div class="dot" style="background:#ef4444"></div>
+                        </div>
+                    </div>
+                    <div style="padding:20px 22px">
+                        <div class="section-head">
+                            <svg class="px" width="18" height="14" viewBox="0 0 18 14" fill="#4ade80">
+                                <rect x="0" y="4" width="18" height="6" />
+                                <rect x="1" y="2" width="16" height="10" />
+                                <rect x="2" y="1" width="5" height="12" />
+                                <rect x="11" y="1" width="5" height="12" />
+                            </svg>
+                            <span class="section-title">TECH_STACK</span>
+                            <div class="editable-zone" style="margin-left:auto">
+                                <button class="edit-pencil" onclick="openSkillsEdit()">✏ EDIT SKILLS</button>
+                            </div>
+                        </div>
+                        <div class="tags" id="d-skills"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROJECTS -->
+            <section>
+                <div class="window">
+                    <div class="win-bar" style="background:#1e293b">
+                        <span class="win-title">PROJECTS.DIR</span>
+                        <div class="win-dots">
+                            <div class="dot" style="background:#eab308"></div>
+                            <div class="dot" style="background:#22c55e"></div>
+                            <div class="dot" style="background:#ef4444"></div>
+                        </div>
+                    </div>
+                    <div style="padding:20px 22px">
+                        <div class="section-head">
+                            <svg class="px" width="20" height="16" viewBox="0 0 20 16" fill="#facc15">
+                                <rect x="0" y="4" width="20" height="12" />
+                                <rect x="0" y="2" width="8" height="4" />
+                                <rect x="1" y="1" width="6" height="2" />
+                            </svg>
+                            <span class="section-title">MY_PROJECTS</span>
+                        </div>
+                        <div class="projects-grid" id="d-projects"></div>
+                        <button id="add-proj-btn" onclick="openAddProject()">＋ ADD NEW PROJECT</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONTACT -->
+            <section>
+                <div class="window" style="margin-bottom:70px">
+                    <div class="win-bar" style="background:#1e293b">
+                        <span class="win-title">CONTACT.EXE</span>
+                        <div class="win-dots">
+                            <div class="dot" style="background:#eab308"></div>
+                            <div class="dot" style="background:#22c55e"></div>
+                            <div class="dot" style="background:#ef4444"></div>
+                        </div>
+                    </div>
+                    <div class="contact-inner">
+                        <div class="section-head" style="margin-bottom:0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                                fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="square">
+                                <polyline points="16 18 22 12 16 6" />
+                                <polyline points="8 6 2 12 8 18" />
+                            </svg>
+                            <span class="section-title">GET_IN_TOUCH</span>
+                            <div class="editable-zone" style="margin-left:auto">
+                                <button class="edit-pencil" onclick="openContactEdit()">✏ EDIT LINKS</button>
+                            </div>
+                        </div>
+                        <p style="font-size:13px;color:#d1d5db;text-align:center">Open to internships, collabs, and cool
+                            side
+                            projects.</p>
+                        <div class="contact-links">
+                            <a id="d-email" href="#" class="contact-link">
+                                <div class="contact-icon-box ic-mail">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+                                        <path
+                                            d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                        <polyline points="22,6 12,13 2,6" />
+                                    </svg>
+                                </div>
+                                <span class="contact-lbl">EMAIL</span>
+                            </a>
+                            <a id="d-github" href="#" target="_blank" class="contact-link">
+                                <div class="contact-icon-box ic-gh">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+                                        <path
+                                            d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                                    </svg>
+                                </div>
+                                <span class="contact-lbl">GITHUB</span>
+                            </a>
+                            <a id="d-linkedin" href="#" target="_blank" class="contact-link">
+                                <div class="contact-icon-box ic-li">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+                                        <path
+                                            d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                                        <rect x="2" y="9" width="4" height="12" />
+                                        <circle cx="4" cy="4" r="2" />
+                                    </svg>
+                                </div>
+                                <span class="contact-lbl">LINKEDIN</span>
+                            </a>
                         </div>
                         <p
-                            style="font-family:'Press Start 2P',monospace;font-size:8px;color:#d1d5db;position:relative;z-index:3">
-                            &gt;&gt;&gt; SYSTEM READY</p>
-                        <div class="editable-zone" style="position:relative;z-index:3;width:100%">
-                            <button class="edit-pencil" onclick="openHeroEdit()">✏ EDIT HERO</button>
-                            <h1
-                                style="font-family:'Press Start 2P',monospace;font-size:clamp(14px,3vw,22px);line-height:1.9;color:#fff">
-                                HI, I'M<br />
-                                <span id="d-name" style="color:#4ade80;text-shadow:0 0 24px #4ade8055">YOUR NAME</span>
-                            </h1>
-                            <p id="d-role" style="font-size:15px;color:#d1d5db;margin-top:10px">Student Developer ·
-                                UI/UX Enthusiast
-                            </p>
-                            <p id="d-sub" style="font-size:12px;color:#d1d5db;margin-top:6px">Building cool things — one
-                                commit at a
-                                time</p>
-                            <a id="d-resume" href="#" class="start-btn" style="margin-top:16px">&#9660; DOWNLOAD
-                                RESUME</a>
-                        </div>
-
-                    </div>
-
-                    <div class="hero-right editable-zone">
-                        <button class="edit-pencil" onclick="openEduEdit()"
-                            style="position:absolute;top:-15px;right:0;">✏ EDIT EDU</button>
-                        <div class="edu-title">COLLEGE_DETAILS</div>
-                        <div class="edu-line"><strong>COLLEGE:</strong> <span id="d-college">IIT Madras</span></div>
-                        <div class="edu-line"><strong>CGPA:</strong> <span id="d-cgpa">7.2</span></div>
-                        <div class="edu-line"><strong>DEGREES:</strong> <span id="d-degrees">BTech</span></div>
+                            style="font-family:'Press Start 2P',monospace;font-size:6px;color:#9ca3af;text-align:center;line-height:2.4">
+                            &gt; PORTFOLIO.EXE — HTML + CSS + JS + FIREBASE<br />&gt; v2.0.0 — 2025
+                        </p>
                     </div>
                 </div>
-        </div>
-        </section>
+            </section>
 
-        <!-- SKILLS -->
-        <section>
-            <div class="window">
-                <div class="win-bar" style="background:#1e293b">
-                    <span class="win-title">SKILLS.DAT</span>
-                    <div class="win-dots">
-                        <div class="dot" style="background:#eab308"></div>
-                        <div class="dot" style="background:#22c55e"></div>
-                        <div class="dot" style="background:#ef4444"></div>
-                    </div>
-                </div>
-                <div style="padding:20px 22px">
-                    <div class="section-head">
-                        <svg class="px" width="18" height="14" viewBox="0 0 18 14" fill="#4ade80">
-                            <rect x="0" y="4" width="18" height="6" />
-                            <rect x="1" y="2" width="16" height="10" />
-                            <rect x="2" y="1" width="5" height="12" />
-                            <rect x="11" y="1" width="5" height="12" />
-                        </svg>
-                        <span class="section-title">TECH_STACK</span>
-                        <div class="editable-zone" style="margin-left:auto">
-                            <button class="edit-pencil" onclick="openSkillsEdit()">✏ EDIT SKILLS</button>
+            <!-- REVIEWS -->
+            <section>
+                <div class="window" style="margin-bottom:70px">
+                    <div class="win-bar" style="background:#1e293b">
+                        <span class="win-title">REVIEWS.EXE</span>
+                        <div class="win-dots">
+                            <div class="dot" style="background:#eab308"></div>
+                            <div class="dot" style="background:#22c55e"></div>
+                            <div class="dot" style="background:#ef4444"></div>
                         </div>
                     </div>
-                    <div class="tags" id="d-skills"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PROJECTS -->
-        <section>
-            <div class="window">
-                <div class="win-bar" style="background:#1e293b">
-                    <span class="win-title">PROJECTS.DIR</span>
-                    <div class="win-dots">
-                        <div class="dot" style="background:#eab308"></div>
-                        <div class="dot" style="background:#22c55e"></div>
-                        <div class="dot" style="background:#ef4444"></div>
-                    </div>
-                </div>
-                <div style="padding:20px 22px">
-                    <div class="section-head">
-                        <svg class="px" width="20" height="16" viewBox="0 0 20 16" fill="#facc15">
-                            <rect x="0" y="4" width="20" height="12" />
-                            <rect x="0" y="2" width="8" height="4" />
-                            <rect x="1" y="1" width="6" height="2" />
-                        </svg>
-                        <span class="section-title">MY_PROJECTS</span>
-                    </div>
-                    <div class="projects-grid" id="d-projects"></div>
-                    <button id="add-proj-btn" onclick="openAddProject()">＋ ADD NEW PROJECT</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- CONTACT -->
-        <section>
-            <div class="window" style="margin-bottom:70px">
-                <div class="win-bar" style="background:#1e293b">
-                    <span class="win-title">CONTACT.EXE</span>
-                    <div class="win-dots">
-                        <div class="dot" style="background:#eab308"></div>
-                        <div class="dot" style="background:#22c55e"></div>
-                        <div class="dot" style="background:#ef4444"></div>
-                    </div>
-                </div>
-                <div class="contact-inner">
-                    <div class="section-head" style="margin-bottom:0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
-                            stroke="#60a5fa" stroke-width="2" stroke-linecap="square">
-                            <polyline points="16 18 22 12 16 6" />
-                            <polyline points="8 6 2 12 8 18" />
-                        </svg>
-                        <span class="section-title">GET_IN_TOUCH</span>
-                        <div class="editable-zone" style="margin-left:auto">
-                            <button class="edit-pencil" onclick="openContactEdit()">✏ EDIT LINKS</button>
+                    <div class="reviews-inner">
+                        <div class="section-head">
+                            <svg class="px" width="18" height="16" viewBox="0 0 18 16" fill="#60a5fa">
+                                <rect x="1" y="0" width="16" height="12" />
+                                <rect x="0" y="1" width="18" height="10" />
+                                <rect x="3" y="12" width="4" height="2" />
+                                <rect x="11" y="12" width="4" height="2" />
+                                <rect x="2" y="14" width="14" height="2" />
+                            </svg>
+                            <span class="section-title">STUDENT_REVIEWS</span>
                         </div>
+                        <div id="review-auth-area"></div>
+                        <div id="reviews-list" class="reviews-list"></div>
                     </div>
-                    <p style="font-size:13px;color:#d1d5db;text-align:center">Open to internships, collabs, and cool
-                        side
-                        projects.</p>
-                    <div class="contact-links">
-                        <a id="d-email" href="#" class="contact-link">
-                            <div class="contact-icon-box ic-mail">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
-                                    <path
-                                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                                    <polyline points="22,6 12,13 2,6" />
-                                </svg>
-                            </div>
-                            <span class="contact-lbl">EMAIL</span>
-                        </a>
-                        <a id="d-github" href="#" target="_blank" class="contact-link">
-                            <div class="contact-icon-box ic-gh">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
-                                    <path
-                                        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-                                </svg>
-                            </div>
-                            <span class="contact-lbl">GITHUB</span>
-                        </a>
-                        <a id="d-linkedin" href="#" target="_blank" class="contact-link">
-                            <div class="contact-icon-box ic-li">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
-                                    <path
-                                        d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                                    <rect x="2" y="9" width="4" height="12" />
-                                    <circle cx="4" cy="4" r="2" />
-                                </svg>
-                            </div>
-                            <span class="contact-lbl">LINKEDIN</span>
-                        </a>
-                    </div>
-                    <p
-                        style="font-family:'Press Start 2P',monospace;font-size:6px;color:#9ca3af;text-align:center;line-height:2.4">
-                        &gt; PORTFOLIO.EXE — HTML + CSS + JS + FIREBASE<br />&gt; v2.0.0 — 2025
-                    </p>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- REVIEWS -->
-        <section>
-            <div class="window" style="margin-bottom:70px">
-                <div class="win-bar" style="background:#1e293b">
-                    <span class="win-title">REVIEWS.EXE</span>
-                    <div class="win-dots">
-                        <div class="dot" style="background:#eab308"></div>
-                        <div class="dot" style="background:#22c55e"></div>
-                        <div class="dot" style="background:#ef4444"></div>
-                    </div>
-                </div>
-                <div class="reviews-inner">
-                    <div class="section-head">
-                        <svg class="px" width="18" height="16" viewBox="0 0 18 16" fill="#60a5fa">
-                            <rect x="1" y="0" width="16" height="12"/>
-                            <rect x="0" y="1" width="18" height="10"/>
-                            <rect x="3" y="12" width="4" height="2"/>
-                            <rect x="11" y="12" width="4" height="2"/>
-                            <rect x="2" y="14" width="14" height="2"/>
-                        </svg>
-                        <span class="section-title">STUDENT_REVIEWS</span>
-                    </div>
-                    <div id="review-auth-area"></div>
-                    <div id="reviews-list" class="reviews-list"></div>
-                </div>
-            </div>
-        </section>
-
-    </div><!-- /container -->
+        </div><!-- /container -->
     </div>
 
     <!-- ══════════ SCRIPT ══════════ -->
@@ -1736,14 +1776,14 @@
         function renderSkills() {
             const skills = DATA.skills || DEFAULTS.skills;
             const container = document.getElementById('d-skills');
-            
+
             // Backward compat: if skills is a flat array, wrap it
             if (Array.isArray(skills)) {
                 container.className = 'tags';
                 container.innerHTML = skills.map(s => `<span class="tag">${esc(s)}</span>`).join('');
                 return;
             }
-            
+
             // Categorized skills
             container.className = 'skill-categories';
             container.innerHTML = Object.entries(skills).map(([cat, items]) => `
@@ -1758,7 +1798,7 @@
             const projects = (DATA.projects || []).map((p, i) => ({ ...p, _origIdx: i }));
             // Sort by like count descending
             projects.sort((a, b) => (projectLikeCounts[b._origIdx] || 0) - (projectLikeCounts[a._origIdx] || 0));
-            
+
             document.getElementById('d-projects').innerHTML = projects.map(p => {
                 const i = p._origIdx;
                 const likeCount = projectLikeCounts[i] || 0;
@@ -1952,7 +1992,7 @@
         function openSkillsEdit() {
             if (!isAdmin) return;
             const skills = DATA.skills || DEFAULTS.skills;
-            
+
             let formHtml = '';
             if (Array.isArray(skills)) {
                 formHtml = `
@@ -1982,7 +2022,7 @@
                     </div>
                 `).join('');
             }
-            
+
             formHtml += `
                 <div style="border:1px dashed #166534;padding:12px;background:#051a0e">
                     <div class="form-group">
@@ -2001,7 +2041,7 @@
                 const newSkills = {};
                 const catInputs = document.querySelectorAll('.skill-cat-input');
                 const itemInputs = document.querySelectorAll('.skill-items-input');
-                
+
                 catInputs.forEach((catEl, i) => {
                     const catName = catEl.value.trim();
                     const catSkills = itemInputs[i].value.split('\n').map(s => s.trim()).filter(Boolean);
@@ -2009,7 +2049,7 @@
                         newSkills[catName] = catSkills;
                     }
                 });
-                
+
                 DATA.skills = newSkills;
                 save();
             });
@@ -2363,157 +2403,109 @@
         initReviews();
         loadProjectLikes();
 
-        // ── Sakura Glitch Effect ──────────────────────────────────────────────────────
-        const canvas = document.getElementById('sakuraCanvas');
-        const ctx = canvas.getContext('2d', { alpha: true });
+        // ── CRT Glitch Effect ──────────────────────────────────────────────────────
+        const crtCanvas = document.getElementById('crtCanvas');
+        const crtCtx = crtCanvas.getContext('2d');
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        let crtWidth, crtHeight;
+
+        function resizeCrt() {
+            crtWidth = window.innerWidth;
+            crtHeight = window.innerHeight;
+            crtCanvas.width = crtWidth;
+            crtCanvas.height = crtHeight;
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        window.addEventListener('resize', resizeCrt);
+        resizeCrt();
 
-        class Sakura {
-            constructor() {
-                this.reset();
-                this.y = Math.random() * canvas.height; // random start across screen
+        const noiseCanvas = document.createElement('canvas');
+        const noiseCtx = noiseCanvas.getContext('2d');
+        const noiseSize = 256;
+        noiseCanvas.width = noiseSize;
+        noiseCanvas.height = noiseSize;
+
+        function generateNoise() {
+            const imgData = noiseCtx.createImageData(noiseSize, noiseSize);
+            const data = imgData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const val = Math.random() * 255;
+                data[i] = val;
+                data[i + 1] = val;
+                data[i + 2] = val;
+                data[i + 3] = 12;
+            }
+            noiseCtx.putImageData(imgData, 0, 0);
+        }
+        generateNoise();
+
+        let crtTime = 0;
+        let isCrtGlitching = false;
+        let crtGlitchDuration = 0;
+        let crtGlitchStart = 0;
+        
+        function getRandomCrtGlitchTime() {
+            return crtTime + 3000 + Math.random() * 5000;
+        }
+        let nextCrtGlitchTime = getRandomCrtGlitchTime();
+
+        let crtLastTime = performance.now();
+
+        function crtLoop(currentTime) {
+            const deltaTime = currentTime - crtLastTime;
+            crtLastTime = currentTime;
+            crtTime += deltaTime;
+
+            crtCtx.fillStyle = '#0a0a10';
+            crtCtx.fillRect(0, 0, crtWidth, crtHeight);
+
+            if (crtTime > nextCrtGlitchTime && !isCrtGlitching) {
+                isCrtGlitching = true;
+                crtGlitchStart = crtTime;
+                crtGlitchDuration = 100 + Math.random() * 300;
+                nextCrtGlitchTime = getRandomCrtGlitchTime();
+            }
+            if (isCrtGlitching && crtTime > crtGlitchStart + crtGlitchDuration) {
+                isCrtGlitching = false;
             }
 
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * -100 - 20;
-                this.size = (Math.random() * 2 + 2) * 3.5; // Scaled up 3.5x for larger pixel blocks
-                this.speedY = Math.random() * 0.8 + 0.3; // Calmer drift
-                this.speedX = Math.random() * 1.0 - 0.5;
-                this.angle = Math.random() * Math.PI * 2;
-                this.spin = (Math.random() - 0.5) * 0.02;
-                this.opacity = Math.random() * 0.4 + 0.4;
+            crtCtx.fillStyle = crtCtx.createPattern(noiseCanvas, 'repeat');
+            crtCtx.save();
+            crtCtx.translate(-Math.random() * noiseSize, -Math.random() * noiseSize);
+            crtCtx.fillRect(0, 0, crtWidth + noiseSize, crtHeight + noiseSize);
+            crtCtx.restore();
 
-                // Glitch properties
-                this.isGlitching = false;
-                this.glitchTimer = 0;
+            const scanlineSpacing = 4;
+            const scanlineSpeed = 0.02;
+            const offset = (crtTime * scanlineSpeed) % scanlineSpacing;
+            
+            crtCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            for (let y = offset; y < crtHeight; y += scanlineSpacing) {
+                crtCtx.fillRect(0, y, crtWidth, 1);
             }
 
-            update() {
-                this.y += this.speedY;
-                this.x += this.speedX + Math.sin(this.angle) * 1.2; // sway
-                this.angle += this.spin;
-
-                if (this.y > canvas.height + 30) {
-                    this.reset();
+            if (isCrtGlitching) {
+                const sliceCount = 3 + Math.floor(Math.random() * 5);
+                for (let i = 0; i < sliceCount; i++) {
+                    const sliceY = Math.random() * crtHeight;
+                    const sliceHeight = 2 + Math.random() * 20;
+                    const colors = ['rgba(0, 255, 255, 0.1)', 'rgba(255, 0, 255, 0.1)', 'rgba(255, 255, 255, 0.15)'];
+                    crtCtx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                    crtCtx.fillRect((Math.random() - 0.5) * 80, sliceY, crtWidth, sliceHeight);
                 }
-
-                // Random glitch trigger (rare: 1 in 1000 frames per particle approx)
-                if (!this.isGlitching && Math.random() < 0.0005) {
-                    this.isGlitching = true;
-                    this.glitchTimer = Math.random() * 10 + 5; // Glitch duration frames
-                }
-
-                if (this.isGlitching) {
-                    this.glitchTimer--;
-                    if (this.glitchTimer <= 0) {
-                        this.isGlitching = false;
-                    }
-                }
+                
+                crtCtx.save();
+                crtCtx.globalCompositeOperation = 'screen';
+                crtCtx.fillStyle = 'rgba(255, 0, 0, 0.06)';
+                crtCtx.fillRect(5 + Math.random() * 5, 0, crtWidth, crtHeight);
+                crtCtx.fillStyle = 'rgba(0, 0, 255, 0.06)';
+                crtCtx.fillRect(-5 - Math.random() * 5, 0, crtWidth, crtHeight);
+                crtCtx.restore();
             }
 
-            draw() {
-                ctx.save();
-
-                let currentX = this.x;
-                let currentY = this.y;
-                let currentOp = this.opacity;
-
-                if (this.isGlitching) {
-                    if (Math.random() < 0.6) currentX += (Math.random() - 0.5) * 80;
-                    if (Math.random() < 0.6) currentY += (Math.random() - 0.5) * 15;
-                    if (Math.random() < 0.6) currentOp = Math.random() * 0.1 + 0.05;
-                }
-
-                ctx.translate(currentX, currentY);
-                // Only rotate if not glitching, glitch looks better statically aligned
-                if (!this.isGlitching) ctx.rotate(this.angle);
-
-                if (this.isGlitching && Math.random() < 0.5) {
-                    if (Math.random() < 0.5) {
-                        // Chromatic aberration blocky shift
-                        ctx.fillStyle = "rgba(0, 255, 255, " + currentOp + ")";
-                        this.drawPetal(16, 0);
-                        ctx.fillStyle = "rgba(255, 0, 255, " + currentOp + ")";
-                        this.drawPetal(-16, 0);
-                    } else {
-                        // Blocky static pattern
-                        ctx.fillStyle = "cyan";
-                        ctx.fillRect(-this.size * 3, -this.size, this.size * 2, this.size * 3);
-                        ctx.fillStyle = "magenta";
-                        ctx.fillRect(this.size, -this.size * 2, this.size * 3, this.size * 2);
-                        ctx.fillStyle = "rgba(255, 255, 255, " + currentOp + ")";
-                        ctx.fillRect(-this.size, this.size, this.size * 4, this.size);
-                    }
-                } else {
-                    ctx.fillStyle = "rgba(255, 183, 197, " + currentOp + ")";
-                    this.drawPetal(0, 0);
-                }
-
-                ctx.restore();
-            }
-
-            drawPetal(x, y) {
-                // Blocky pixel-art sprite (cluster of squares)
-                const s = Math.round(this.size);
-                ctx.fillRect(x - s, y - s * 2, s * 2, s * 4); // Vertical stem
-                ctx.fillRect(x - s * 2, y - s, s * 4, s * 2); // Horizontal cross
-            }
+            requestAnimationFrame(crtLoop);
         }
 
-        const sakuras = [];
-        const particleCount = Math.min(Math.floor(window.innerWidth / 80), 8); // Sparse: 5-8 particles max
-        for (let i = 0; i < particleCount; i++) {
-            sakuras.push(new Sakura());
-        }
-
-        let globalTime = 0;
-        function drawBranches() {
-            ctx.save();
-            // Blocky static dark branches
-            ctx.fillStyle = "#5c5055"; // Muted, desaturated purple/brown for better visibility
-            const s = 14; // Pixel size for tree blocks (increased from 10 to 14)
-
-            // Top Left pixelation coords [x, y, w, h] multipliers
-            const branchL = [
-                [0, 0, 4, 14], [4, 4, 4, 2], [4, 6, 8, 4], [12, 6, 4, 2],
-                [8, 10, 4, 4], [12, 12, 6, 2], [16, 14, 4, 2],
-                [0, 14, 2, 8], [2, 18, 4, 4], [6, 20, 2, 2]
-            ];
-            branchL.forEach(b => ctx.fillRect(b[0] * s, b[1] * s, b[2] * s, b[3] * s));
-
-            // Top Right
-            ctx.translate(canvas.width, 0);
-            const branchR = [
-                [-4, 0, 4, 16], [-8, 6, 4, 4], [-12, 8, 4, 6],
-                [-16, 12, 4, 2], [-20, 10, 4, 2],
-                [-8, 18, 4, 2], [-14, 20, 6, 2], [-18, 22, 4, 2]
-            ];
-            branchR.forEach(b => ctx.fillRect(b[0] * s, b[1] * s, b[2] * s, b[3] * s));
-            ctx.restore();
-        }
-
-        function animateSakura() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            globalTime++;
-
-            drawBranches();
-
-            sakuras.forEach(s => {
-                s.update();
-                s.draw();
-            });
-
-            requestAnimationFrame(animateSakura);
-        }
-
-        animateSakura();
+        requestAnimationFrame(crtLoop);
     </script>
 </body>
 
